@@ -1,17 +1,17 @@
 """Configure a PixelIt display through Home Assistant."""
+
 from __future__ import annotations
 
 import asyncio
 
 import aiohttp
 import voluptuous as vol
-from yarl import URL
-
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_HOST, CONF_PORT
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from yarl import URL
 
 from .const import (
     CONF_HEIGHT,
@@ -36,14 +36,12 @@ async def _test_connection(hass: HomeAssistant, host: str, port: int) -> bool:
         return False
 
 
-class PixelItLiveviewConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for PixelIt Liveview."""
+class PixelItConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """Handle a config flow for PixelIt."""
 
     VERSION = 1
 
-    async def async_step_user(
-        self, user_input: dict | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_user(self, user_input: dict | None = None) -> ConfigFlowResult:
         """Handle the initial step."""
         return await self._async_configure("user", user_input)
 
@@ -61,9 +59,11 @@ class PixelItLiveviewConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             host = user_input[CONF_HOST].strip()
-            port = user_input[CONF_PORT]
-            if not host or any(char in host for char in "/?#@") or any(
-                char.isspace() for char in host
+            port = entry.data.get(CONF_PORT, DEFAULT_PORT) if entry else DEFAULT_PORT
+            if (
+                not host
+                or any(char in host for char in "/?#@")
+                or any(char.isspace() for char in host)
             ):
                 errors[CONF_HOST] = "invalid_host"
             else:
@@ -86,21 +86,22 @@ class PixelItLiveviewConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         schema = vol.Schema(
             {
                 vol.Required(CONF_HOST, default=DEFAULT_HOST): str,
-                vol.Required(CONF_PORT, default=DEFAULT_PORT): vol.All(
-                    int, vol.Range(min=1, max=65535)
-                ),
                 vol.Required(CONF_WIDTH, default=DEFAULT_WIDTH): vol.All(
                     int, vol.Range(min=1)
                 ),
                 vol.Required(CONF_HEIGHT, default=DEFAULT_HEIGHT): vol.All(
                     int, vol.Range(min=1)
                 ),
+                vol.Optional("bitmap_api_uuid", default=""): vol.All(
+                    str, vol.Length(max=128)
+                ),
             }
         )
         return self.async_show_form(
             step_id=step_id,
             data_schema=self.add_suggested_values_to_schema(
-                schema, user_input if user_input is not None else entry.data if entry else None
+                schema,
+                user_input if user_input is not None else entry.data if entry else None,
             ),
             errors=errors,
         )

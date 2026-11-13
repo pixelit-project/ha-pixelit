@@ -1,0 +1,161 @@
+# Technical reference
+
+## Unified Gallery icons
+
+`show_message`, `show_alert` and `set_screen` accept an optional action-level
+`icon` ID and `icon_animation_delay` (10–60000 ms, default 100). Advanced screen
+objects can instead include `icon`, `icon_animation_delay` and
+`icon_position: {x: 0, y: 0}` directly. Do not specify an icon at both levels or
+combine it with explicit `bitmap` / `bitmapAnimation` content.
+
+Gallery frames determine the firmware payload: one frame becomes `bitmap`,
+multiple frames become `bitmapAnimation`. Inferred size is 8×8 or 32×8. The
+default icon position is (0,0); text without an explicit position starts one
+pixel to the right of the icon, at y=1. Explicit text positioning is preserved.
+Resolved screen content is validated against display and transport limits and
+stored as pixels. Existing explicit bitmap payloads remain supported.
+
+## Screens, playlists and alerts
+
+Actions accept the Display light entity, its device or an area as target. Each
+display owns its screens and playlist independently. Screen payloads use the
+firmware's `text`, `clock`, `bitmap`, `bitmapAnimation` and optional
+`switchAnimation` objects. GPIO, firmware configuration and arbitrary device
+commands are intentionally excluded from these display-content actions.
+
+Store named screens first (repeat for each screen):
+
+```yaml
+action: pixelit.set_screen
+target:
+  entity_id: light.your_pixelit_display
+data:
+  name: clock
+  duration: 10
+  screen:
+    clock:
+      show: true
+```
+
+```yaml
+action: pixelit.set_screen
+target:
+  entity_id: light.your_pixelit_display
+data:
+  name: solar
+  duration: 5
+  screen:
+    text:
+      textString: "PV {{ states('sensor.pv_power') }} W"
+      hexColor: "#FFFF00"
+      scrollText: auto
+      bigFont: false
+      position: {x: 0, y: 1}
+```
+
+HA evaluates templates when the action runs. Update the named screen from an
+automation triggered by the sensor to keep its value current; stored screens are
+snapshots, not templates that are continually reevaluated.
+
+Start rotation:
+
+```yaml
+action: pixelit.set_playlist
+target:
+  entity_id: light.your_pixelit_display
+data:
+  screens: [clock, solar]
+```
+
+Temporarily interrupt it:
+
+```yaml
+action: pixelit.show_alert
+target:
+  entity_id: light.your_pixelit_display
+data:
+  duration: 10
+  screen:
+    text:
+      textString: "Waschmaschine fertig"
+      hexColor: "#00FF00"
+      scrollText: auto
+      position: {x: 0, y: 1}
+```
+
+Here `duration: 10` means **resume managed playback after ten seconds**, measured
+from firmware acknowledgement. Unlike `protection_duration`, it is a timer in HA.
+The next playlist screen follows an alert; its full configured duration starts
+when it is sent. Without a playlist, HA restores its last managed base screen.
+Without either, HA switches to the device clock. Content created externally by
+MQTT, Node-RED or the WebUI cannot be reconstructed or restored from live pixels.
+A newer alert replaces the previous alert and its timer; alerts are not queued.
+
+`pixelit.show_screen` with `name` shows one stored screen persistently and stops
+rotation. `pixelit.stop_playlist` (no fields), or an empty `screens` list, stops
+rotation and any alert timer, leaving the current display content visible.
+Updating a screen with `set_screen` changes its next playlist turn. Unknown names,
+invalid durations and invalid payloads are rejected before changing playback.
+
+Saved screens and playlist order survive reloads and HA restarts. Playback starts
+at the beginning after reload. Temporary alerts, standalone base content, elapsed
+time and playlist position are not persisted. Removing the integration deletes
+its stored screens and playlist. Sleep and disconnect pause playback; on wake or
+reconnect the next playlist screen resumes, or the managed base is reapplied.
+An interrupted alert is discarded. Starting a playlist while asleep does not wake
+the display; explicitly showing a message, screen or alert does.
+
+Background transmission failures pause playback and set `playback_error` on the
+Display entity. Reconnect or a new playback action can resume it. There is no
+continuous retry loop. Entity attributes also expose `current_screen`, `playlist`,
+`stored_screens` and `alert_active`, without publishing the full screen payloads.
+HA must stay running for rotation and alert expiry. Avoid running a Node-RED
+playlist on the same display simultaneously; both controllers can send content.
+An existing firmware-protected screen can defer HA content even after an OK
+acknowledgement. Avoid firmware protection when using HA playlist/alert timers.
+
+### Bitmaps and animations
+
+Supply RGB565 integer arrays as `bitmap.data`, or arrays of frames as
+`bitmapAnimation.data`, with optional `size: {width: 8, height: 8}`. An animation
+also needs `animationDelay` in milliseconds. As in the Node-RED Core node,
+`data: 42` resolves gallery bitmap ID 42. Use `bitmapAnimation` for animated gallery
+entries. Missing gallery dimensions are inferred as 8×8 or 32×8. Gallery downloads
+use the PixelIt API and the optional configured API UUID, with a five-second
+timeout, a 128 KiB response limit, and a per-display LRU cache of at most 32 entries
+or 256 KiB. Invalid responses fail the action without changing active playback.
+Resolved pixels are stored with named screens, so rotation does not repeatedly
+request the gallery. Inline pixels need no internet connection.
+
+The integration conservatively limits each screen to a 12,288-byte WebSocket
+message, each bitmap/frame to 256 pixels within the configured matrix dimensions,
+and animations to 28 frames / 1,792 total pixels. It does not increase firmware
+limits or silently truncate content. At most 100 named screens, 100 playlist
+entries and 256 KiB of stored content are allowed. Screen/alert durations are
+1–86,400 seconds. Smooth playback and ESP8266 peak memory still require device
+validation before release. Transition support depends on device firmware;
+bitmap-wipe transition data is currently rejected.
+
+## How it works
+
+1. The integration opens a WebSocket to `ws://<pixelit-ip>:81`.
+2. PixelIt streams its live pixels as `{"liveview":"<hex>"}` (~6 hex chars per pixel, row by row).
+3. The integration validates the frame and publishes it as the sensor’s `hex` attribute.
+4. The card decodes the frame and renders the pixels as a grid, stretching to fill the card width while keeping pixels square.
+
+
+## WebSocket port
+
+New entries use the firmware's fixed WebSocket port 81 without asking the user.
+Existing entries retain a stored port internally for compatibility, including
+when reconfiguring their host or dimensions.
+
+## Card editor and layout
+
+The custom editor uses `ha-form` and native selectors, with language-aware labels
+and a collapsible Advanced section. Editor/YAML configuration shares validation
+for gap (integer 0–16), booleans, title and sensor entity. Older card tags and
+width/height fallbacks remain supported. Theme styling is the default; set
+`transparent: true` for the previous frameless appearance. Status is independent
+of the title. Sections use automatic content height; masonry uses measured height
+with an aspect-ratio estimate before layout. Pixel gaps shrink on narrow cards.

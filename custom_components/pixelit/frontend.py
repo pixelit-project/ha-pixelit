@@ -1,4 +1,5 @@
 """Serve the bundled card and register its dashboard resource."""
+
 from __future__ import annotations
 
 import asyncio
@@ -14,9 +15,13 @@ from homeassistant.core import HomeAssistant
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
-JS_FILENAME = "pixelit-liveview-card.js"
+JS_FILENAME = "pixelit-card.js"
 RESOURCE_URL = f"/{DOMAIN}/{JS_FILENAME}"
-LEGACY_URL = f"/local/{JS_FILENAME}"
+LEGACY_URLS = (
+    "/local/pixelit-liveview-card.js",
+    "/pixelit_liveview/pixelit-liveview-card.js",
+    "/pixelit/pixelit-liveview-card.js",
+)
 
 
 async def ensure_frontend(hass: HomeAssistant) -> None:
@@ -29,7 +34,11 @@ async def ensure_frontend(hass: HomeAssistant) -> None:
                 content = await hass.async_add_executor_job(source.read_bytes)
                 token = hashlib.sha256(content).hexdigest()[:12]
                 await hass.http.async_register_static_paths(
-                    [StaticPathConfig(RESOURCE_URL, str(source), False)]
+                    [
+                        StaticPathConfig(url, str(source), False)
+                        for url in (RESOURCE_URL, *LEGACY_URLS)
+                        if not url.startswith("/local/")
+                    ]
                 )
                 frontend["resource_url"] = f"{RESOURCE_URL}?v={token}"
 
@@ -38,7 +47,9 @@ async def ensure_frontend(hass: HomeAssistant) -> None:
             if isinstance(resources, ResourceStorageCollection):
                 await _register_resource(resources, frontend["resource_url"])
         except Exception:
-            _LOGGER.warning("Could not register the PixelIt dashboard card", exc_info=True)
+            _LOGGER.warning(
+                "Could not register the PixelIt dashboard card", exc_info=True
+            )
 
 
 async def _register_resource(resources: ResourceStorageCollection, url: str) -> None:
@@ -47,7 +58,7 @@ async def _register_resource(resources: ResourceStorageCollection, url: str) -> 
     matches = [
         item
         for item in resources.async_items()
-        if item["url"].split("?", 1)[0] in (RESOURCE_URL, LEGACY_URL)
+        if item["url"].split("?", 1)[0] in (RESOURCE_URL, *LEGACY_URLS)
     ]
     if not matches:
         await resources.async_create_item({"res_type": "module", "url": url})

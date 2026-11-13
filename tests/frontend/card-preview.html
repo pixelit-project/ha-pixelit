@@ -1,0 +1,34 @@
+<!doctype html><html lang="de"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>PixelIt Kartenprüfung</title>
+<style>
+body{margin:24px;font:14px system-ui;background:#e9edf2;color:#18212c}h1{font-size:22px}main{display:flex;flex-wrap:wrap;align-items:flex-start;gap:24px}.sample{padding:16px;background:#fafafa;border-radius:16px}.dark{background:#101319;--ha-card-background:#20252d;--primary-text-color:#f5f6fa;--secondary-text-color:#b8bfcb;--success-color:#63d69e;--error-color:#ff8585;color:#f5f6fa}.light{--ha-card-background:#fff;--primary-text-color:#18212c;--secondary-text-color:#526173;--success-color:#146c43;--error-color:#b42318}h2{font-size:14px;margin:0 0 12px}pre{white-space:pre-wrap;padding:16px;background:white;border-radius:8px}
+</style><h1>PixelIt: lokale Layoutprüfung</h1><p>Echte PixelIt-Karte mit Testdaten. HA-Kartenrahmen nachgebildet; kein laufendes Home Assistant.</p><main id="samples"></main><pre id="results">Prüfung läuft …</pre>
+<script type="module">
+class HACard extends HTMLElement{constructor(){super();this.attachShadow({mode:'open'}).innerHTML='<style>:host{display:block;background:var(--ha-card-background,white);border:1px solid var(--ha-card-border-color,#8884);border-radius:var(--ha-card-border-radius,12px);box-shadow:var(--ha-card-box-shadow,0 2px 4px #0001);color:var(--primary-text-color)}</style><slot></slot>';}}
+customElements.define('ha-card',HACard);
+await import('../../custom_components/pixelit/www/pixelit-card.js');
+const hex=Array.from({length:256},(_,n)=>{const x=n%32,y=Math.floor(n/32);return (x>1&&x<7&&y>1&&y<6)?'FF3355':x>10&&y===(x%6)+1?'44DD88':'000000';}).join('');
+const state={state:'connected',attributes:{width:32,height:8,hex}};
+const cases=[
+ ['Hell, 320 px','light',320,{}],['Dunkel, 320 px','dark',320,{}],
+ ['Status ohne Titel','dark',320,{show_header:false}],
+ ['Schmal, langer Titel, Abstand 16','light',160,{title:'Ein sehr langer PixelIt Displayname',gap:16}],
+ ['Transparent','dark',320,{transparent:true}],
+ ['Keine Verbindung','light',320,{disconnected:true}],
+ ['Status ohne Pixel','light',240,{show_header:false,show_pixels:false}],
+ ['Kein Sensor ausgewählt','dark',240,{entity:''}],
+];
+const checks=[];
+for(const [label,theme,width,options] of cases){
+ const box=document.createElement('section');box.className='sample '+theme;box.style.width=width+'px';
+ const heading=document.createElement('h2');heading.textContent=label;box.append(heading);
+ const card=document.createElement('pixelit-card');const {disconnected,...config}=options;
+ card.setConfig({entity:'sensor.pixelit',...config});card.hass={language:'de',states:{'sensor.pixelit':disconnected?{...state,state:'disconnected'}:state}};
+ box.append(card);document.querySelector('main').append(box);await card.updateComplete;
+ const root=card.shadowRoot,grid=root.querySelector('.plc-grid'),pixel=root.querySelector('.px');
+ if(grid){checks.push([label+' – kein Überlauf',grid.getBoundingClientRect().width<=width]);}
+ if(pixel){const rect=pixel.getBoundingClientRect();checks.push([label+' – quadratische Pixel',Math.abs(rect.width-rect.height)<1]);}
+ if(config.show_header===false&&config.show_status!==false&&config.entity!=='')checks.push([label+' – Status sichtbar',!!root.querySelector('.plc-status')]);
+ checks.push([label+' – Höhe sinnvoll',card.getCardSize()>0]);
+}
+document.querySelector('#results').textContent=checks.map(([name,ok])=>(ok?'PASS':'FAIL')+' '+name).join('\n');
+</script></html>

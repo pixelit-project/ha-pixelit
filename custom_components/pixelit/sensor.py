@@ -1,4 +1,5 @@
 """Sensor exposing the latest PixelIt frame."""
+
 from __future__ import annotations
 
 from homeassistant.components.sensor import SensorEntity
@@ -7,10 +8,13 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import PixelItConfigEntry
 from .const import SENSOR_NAME
+from .entity import device_info
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: PixelItConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: PixelItConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Add one sensor per configured display."""
     async_add_entities([PixelItLiveviewSensor(entry)])
@@ -26,6 +30,7 @@ class PixelItLiveviewSensor(SensorEntity):
 
     def __init__(self, entry: PixelItConfigEntry) -> None:
         """Initialize the sensor with a stable registry ID."""
+        self._attr_device_info = device_info(entry)
         self._attr_unique_id = entry.entry_id
         self._attr_name = f"{SENSOR_NAME} ({entry.title})"
         self._coordinator = entry.runtime_data

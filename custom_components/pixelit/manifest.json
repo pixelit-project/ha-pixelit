@@ -1,6 +1,6 @@
 {
-  "domain": "pixelit_liveview",
-  "name": "PixelIt Liveview",
+  "domain": "pixelit",
+  "name": "PixelIt",
   "after_dependencies": [
     "lovelace"
   ],

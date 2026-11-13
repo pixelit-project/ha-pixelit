@@ -1,0 +1,152 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "PixelIt",
+        "description": "Verbinde dein PixelIt-Display über seine IP-Adresse oder seinen Hostnamen und gib die Matrixgröße an.",
+        "data": {
+          "host": "IP-Adresse des PixelIt-Displays",
+          "width": "Matrix-Breite in Pixeln (z.B. 32)",
+          "height": "Matrix-Höhe in Pixeln (z.B. 8)",
+          "bitmap_api_uuid": "Bitmap-API UUID (optional)"
+        }
+      },
+      "reconfigure": {
+        "title": "PixelIt neu konfigurieren",
+        "description": "Ändere die Adresse oder die Matrixgröße des Displays.",
+        "data": {
+          "host": "IP-Adresse des PixelIt-Displays",
+          "width": "Matrix-Breite in Pixeln (z.B. 32)",
+          "height": "Matrix-Höhe in Pixeln (z.B. 8)",
+          "bitmap_api_uuid": "Bitmap-API UUID (optional)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Keine Verbindung möglich. Prüfe die Adresse und ob dein PixelIt erreichbar ist.",
+      "invalid_host": "Gib einen Hostnamen oder eine IP-Adresse ohne URL oder Port ein."
+    },
+    "abort": {
+      "already_configured": "Dieses PixelIt ist bereits konfiguriert."
+    }
+  },
+  "entity": {
+    "light": {
+      "display": {
+        "name": "Display"
+      }
+    }
+  },
+  "services": {
+    "show_message": {
+      "name": "Nachricht anzeigen",
+      "description": "Zeigt eine dauerhafte Nachricht und stoppt die Playlist.",
+      "fields": {
+        "message": {
+          "name": "Nachricht",
+          "description": "Anzuzeigender Text (1–255 Zeichen)."
+        },
+        "color": {
+          "name": "Textfarbe",
+          "description": "Textfarbe als #RRGGBB."
+        },
+        "scroll": {
+          "name": "Scrollmodus",
+          "description": "Automatisch, immer oder aus."
+        },
+        "large_font": {
+          "name": "Große Schrift",
+          "description": "Große statt kleiner Schrift verwenden."
+        },
+        "center": {
+          "name": "Zentrieren",
+          "description": "Text horizontal zentrieren."
+        },
+        "protection_duration": {
+          "name": "Schutzdauer",
+          "description": "Sekunden, in denen die Firmware andere Inhalte blockiert. 0 deaktiviert den Schutz. Stellt den vorherigen Inhalt nicht wieder her."
+        },
+        "icon": {
+          "name": "Gallery-Icon",
+          "description": "Gallery-ID des Icons. Statische und animierte Icons werden automatisch erkannt."
+        },
+        "icon_animation_delay": {
+          "name": "Animationsgeschwindigkeit",
+          "description": "Zeit zwischen Bildern in Millisekunden. Bei statischen Icons ohne Wirkung."
+        }
+      }
+    },
+    "set_screen": {
+      "name": "Screen speichern",
+      "description": "Speichert oder aktualisiert einen benannten Screen. Die laufende Anzeige ändert sich beim nächsten Wechsel.",
+      "fields": {
+        "name": {
+          "name": "Name",
+          "description": "Eindeutiger Screen-Name (1–64 Zeichen)."
+        },
+        "screen": {
+          "name": "Inhalt",
+          "description": "PixelIt-Screen-Objekt mit Text, Uhr, Bitmap oder Animation."
+        },
+        "duration": {
+          "name": "Anzeigedauer",
+          "description": "Sekunden pro Durchlauf in einer Playlist."
+        },
+        "icon": {
+          "name": "Gallery-Icon",
+          "description": "Gallery-ID des Icons. Statische und animierte Icons werden automatisch erkannt."
+        },
+        "icon_animation_delay": {
+          "name": "Animationsgeschwindigkeit",
+          "description": "Zeit zwischen Bildern in Millisekunden. Bei statischen Icons ohne Wirkung."
+        }
+      }
+    },
+    "show_screen": {
+      "name": "Screen anzeigen",
+      "description": "Zeigt einen gespeicherten Screen dauerhaft und stoppt die Playlist.",
+      "fields": {
+        "name": {
+          "name": "Name",
+          "description": "Name eines gespeicherten Screens."
+        }
+      }
+    },
+    "set_playlist": {
+      "name": "Playlist starten",
+      "description": "Speichert eine Playlist und startet sie, sobald das Display verbunden und eingeschaltet ist.",
+      "fields": {
+        "screens": {
+          "name": "Screens",
+          "description": "Geordnete Liste gespeicherter Screen-Namen. Eine leere Liste stoppt die Rotation."
+        }
+      }
+    },
+    "stop_playlist": {
+      "name": "Playlist stoppen",
+      "description": "Stoppt die Rotation und einen aktiven Alert-Timer. Der aktuelle Inhalt bleibt sichtbar."
+    },
+    "show_alert": {
+      "name": "Alert anzeigen",
+      "description": "Unterbricht die Playlist vorübergehend. Danach folgt der nächste Screen, die letzte verwaltete Anzeige oder die Uhr. Ein neuer Alert ersetzt den vorherigen.",
+      "fields": {
+        "screen": {
+          "name": "Inhalt",
+          "description": "PixelIt-Screen-Objekt des Alerts, zum Beispiel text.textString und text.hexColor."
+        },
+        "duration": {
+          "name": "Anzeigedauer",
+          "description": "Sekunden ab erfolgreicher Übertragung, danach setzt HA die verwaltete Anzeige fort."
+        },
+        "icon": {
+          "name": "Gallery-Icon",
+          "description": "Gallery-ID des Icons. Statische und animierte Icons werden automatisch erkannt."
+        },
+        "icon_animation_delay": {
+          "name": "Animationsgeschwindigkeit",
+          "description": "Zeit zwischen Bildern in Millisekunden. Bei statischen Icons ohne Wirkung."
+        }
+      }
+    }
+  }
+}

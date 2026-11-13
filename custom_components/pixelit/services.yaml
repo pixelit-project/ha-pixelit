@@ -1,0 +1,156 @@
+show_message:
+  target:
+    entity:
+      integration: pixelit
+      domain: light
+  fields:
+    message:
+      required: true
+      example: Waschmaschine fertig
+      selector:
+        text: null
+    color:
+      default: '#FFFFFF'
+      example: '#00FF00'
+      selector:
+        text: null
+    scroll:
+      default: auto
+      selector:
+        select:
+          options:
+          - auto
+          - always
+          - 'off'
+    large_font:
+      default: false
+      selector:
+        boolean: null
+    center:
+      default: true
+      selector:
+        boolean: null
+    protection_duration:
+      default: 0
+      selector:
+        number:
+          min: 0
+          max: 86400
+          step: 1
+          unit_of_measurement: s
+          mode: box
+    icon:
+      example: 42
+      selector:
+        number:
+          min: 1
+          max: 2147483647
+          mode: box
+    icon_animation_delay:
+      default: 100
+      selector:
+        number:
+          min: 10
+          max: 60000
+          step: 1
+          unit_of_measurement: ms
+          mode: box
+set_screen:
+  target:
+    entity:
+      integration: pixelit
+      domain: light
+  fields:
+    name:
+      selector:
+        text: null
+      required: true
+    screen:
+      selector:
+        object: null
+      required: true
+    duration:
+      selector:
+        number:
+          min: 1
+          max: 86400
+          step: 1
+          unit_of_measurement: s
+          mode: box
+      default: 5
+    icon:
+      example: 42
+      selector:
+        number:
+          min: 1
+          max: 2147483647
+          mode: box
+    icon_animation_delay:
+      default: 100
+      selector:
+        number:
+          min: 10
+          max: 60000
+          step: 1
+          unit_of_measurement: ms
+          mode: box
+show_screen:
+  target:
+    entity:
+      integration: pixelit
+      domain: light
+  fields:
+    name:
+      selector:
+        text: null
+      required: true
+set_playlist:
+  target:
+    entity:
+      integration: pixelit
+      domain: light
+  fields:
+    screens:
+      selector:
+        object: null
+      required: true
+stop_playlist:
+  target:
+    entity:
+      integration: pixelit
+      domain: light
+show_alert:
+  target:
+    entity:
+      integration: pixelit
+      domain: light
+  fields:
+    screen:
+      selector:
+        object: null
+      required: true
+    duration:
+      selector:
+        number:
+          min: 1
+          max: 86400
+          step: 1
+          unit_of_measurement: s
+          mode: box
+      default: 10
+    icon:
+      example: 42
+      selector:
+        number:
+          min: 1
+          max: 2147483647
+          mode: box
+    icon_animation_delay:
+      default: 100
+      selector:
+        number:
+          min: 10
+          max: 60000
+          step: 1
+          unit_of_measurement: ms
+          mode: box

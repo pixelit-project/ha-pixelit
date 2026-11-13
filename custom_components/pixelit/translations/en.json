@@ -1,0 +1,152 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "PixelIt",
+        "description": "Connect your PixelIt display using its host and matrix dimensions.",
+        "data": {
+          "host": "PixelIt host",
+          "width": "Matrix width in pixels",
+          "height": "Matrix height in pixels",
+          "bitmap_api_uuid": "Bitmap API UUID (optional)"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure PixelIt",
+        "description": "Change the display address or matrix dimensions.",
+        "data": {
+          "host": "PixelIt host",
+          "width": "Matrix width in pixels",
+          "height": "Matrix height in pixels",
+          "bitmap_api_uuid": "Bitmap API UUID (optional)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect. Check the address and that your PixelIt is reachable.",
+      "invalid_host": "Enter a hostname or IP address without a URL or port."
+    },
+    "abort": {
+      "already_configured": "This PixelIt is already configured."
+    }
+  },
+  "entity": {
+    "light": {
+      "display": {
+        "name": "Display"
+      }
+    }
+  },
+  "services": {
+    "show_message": {
+      "name": "Show message",
+      "description": "Show a persistent message and stop the playlist.",
+      "fields": {
+        "message": {
+          "name": "Message",
+          "description": "Text to display (1–255 characters)."
+        },
+        "color": {
+          "name": "Text color",
+          "description": "Text color as #RRGGBB."
+        },
+        "scroll": {
+          "name": "Scrolling",
+          "description": "Scroll automatically, always, or never."
+        },
+        "large_font": {
+          "name": "Large font",
+          "description": "Use the large font instead of the small font."
+        },
+        "center": {
+          "name": "Center text",
+          "description": "Center text horizontally."
+        },
+        "protection_duration": {
+          "name": "Protection duration",
+          "description": "Seconds during which firmware blocks other content. 0 disables protection. Does not restore previous content."
+        },
+        "icon": {
+          "name": "Gallery icon",
+          "description": "Gallery icon ID. Static and animated icons are detected automatically."
+        },
+        "icon_animation_delay": {
+          "name": "Animation speed",
+          "description": "Milliseconds between frames. Has no effect on static icons."
+        }
+      }
+    },
+    "set_screen": {
+      "name": "Store screen",
+      "description": "Store or update a named screen. A playing screen changes on its next turn.",
+      "fields": {
+        "name": {
+          "name": "Name",
+          "description": "Unique screen name (1–64 characters)."
+        },
+        "screen": {
+          "name": "Content",
+          "description": "PixelIt screen object containing text, clock, bitmap or animation."
+        },
+        "duration": {
+          "name": "Display duration",
+          "description": "Seconds per turn in a playlist."
+        },
+        "icon": {
+          "name": "Gallery icon",
+          "description": "Gallery icon ID. Static and animated icons are detected automatically."
+        },
+        "icon_animation_delay": {
+          "name": "Animation speed",
+          "description": "Milliseconds between frames. Has no effect on static icons."
+        }
+      }
+    },
+    "show_screen": {
+      "name": "Show screen",
+      "description": "Show a stored screen persistently and stop the playlist.",
+      "fields": {
+        "name": {
+          "name": "Name",
+          "description": "Name of a stored screen."
+        }
+      }
+    },
+    "set_playlist": {
+      "name": "Start playlist",
+      "description": "Save a playlist and start when the display is connected and awake.",
+      "fields": {
+        "screens": {
+          "name": "Screens",
+          "description": "Ordered list of stored screen names. An empty list stops rotation."
+        }
+      }
+    },
+    "stop_playlist": {
+      "name": "Stop playlist",
+      "description": "Stop rotation and any active alert timer, leaving current content visible."
+    },
+    "show_alert": {
+      "name": "Show alert",
+      "description": "Temporarily interrupt playback, then show the next playlist screen, last managed content or clock. A new alert replaces the previous alert.",
+      "fields": {
+        "screen": {
+          "name": "Content",
+          "description": "PixelIt alert screen object, for example text.textString and text.hexColor."
+        },
+        "duration": {
+          "name": "Display duration",
+          "description": "Seconds after successful transmission before HA resumes managed content."
+        },
+        "icon": {
+          "name": "Gallery icon",
+          "description": "Gallery icon ID. Static and animated icons are detected automatically."
+        },
+        "icon_animation_delay": {
+          "name": "Animation speed",
+          "description": "Milliseconds between frames. Has no effect on static icons."
+        }
+      }
+    }
+  }
+}

@@ -1,4 +1,5 @@
 {
-  "name": "PixelIt Liveview",
-  "render_readme": true
+  "name": "PixelIt",
+  "render_readme": true,
+  "homeassistant": "2025.10.0"
 }

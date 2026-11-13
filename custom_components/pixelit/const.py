@@ -1,6 +1,6 @@
-"""Constants for the PixelIt Liveview integration."""
+"""Constants for the PixelIt integration."""
 
-DOMAIN = "pixelit_liveview"
+DOMAIN = "pixelit"
 
 CONF_WIDTH = "width"
 CONF_HEIGHT = "height"
