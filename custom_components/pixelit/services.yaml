@@ -21,6 +21,25 @@ show_message:
       selector:
         text:
           type: color
+    transition:
+      default: none
+      selector:
+        select:
+          options:
+          - none
+          - random
+          - fade
+          - coloredBarWipe
+          - zigzagWipe
+          - bitmapWipe
+          - curtain
+          - pixelDissolve
+          - slide
+          - blinds
+          - crt
+          - glitch
+          - verticalSlide
+          translation_key: transition
     text_options:
       collapsed: true
       fields:
@@ -62,6 +81,13 @@ show_message:
               step: 1
               unit_of_measurement: s
               mode: box
+        transition_bitmap:
+          example: 42
+          selector:
+            number:
+              min: 1
+              max: 2147483647
+              mode: box
 set_screen:
   target:
     entity:
@@ -100,6 +126,25 @@ set_screen:
     clock:
       selector:
         boolean: {}
+    transition:
+      default: none
+      selector:
+        select:
+          options:
+          - none
+          - random
+          - fade
+          - coloredBarWipe
+          - zigzagWipe
+          - bitmapWipe
+          - curtain
+          - pixelDissolve
+          - slide
+          - blinds
+          - crt
+          - glitch
+          - verticalSlide
+          translation_key: transition
     text_options:
       collapsed: true
       fields:
@@ -135,6 +180,13 @@ set_screen:
         screen:
           selector:
             object: null
+        transition_bitmap:
+          example: 42
+          selector:
+            number:
+              min: 1
+              max: 2147483647
+              mode: box
 show_screen:
   target:
     entity:
@@ -195,6 +247,25 @@ show_alert:
     clock:
       selector:
         boolean: {}
+    transition:
+      default: none
+      selector:
+        select:
+          options:
+          - none
+          - random
+          - fade
+          - coloredBarWipe
+          - zigzagWipe
+          - bitmapWipe
+          - curtain
+          - pixelDissolve
+          - slide
+          - blinds
+          - crt
+          - glitch
+          - verticalSlide
+          translation_key: transition
     text_options:
       collapsed: true
       fields:
@@ -230,3 +301,10 @@ show_alert:
         screen:
           selector:
             object: null
+        transition_bitmap:
+          example: 42
+          selector:
+            number:
+              min: 1
+              max: 2147483647
+              mode: box

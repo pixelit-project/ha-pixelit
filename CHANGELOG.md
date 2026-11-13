@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Remove the optional Gallery API UUID setting from setup and reconfiguration.
+
+- Add transition selectors, static Gallery bitmap wipes and firmware 3.0.0 prerelease compatibility checks for messages, alerts and saved displays.
+
 - Add push-based environment, battery and diagnostic sensors without MQTT, with automatic hardware detection and Liveview-only card selection.
 
 - Add simple text, color and clock controls for saved displays and alerts, with collapsible advanced options and an easy playlist list editor.

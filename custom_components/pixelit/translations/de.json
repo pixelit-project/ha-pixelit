@@ -7,8 +7,7 @@
         "data": {
           "host": "IP-Adresse des PixelIt-Displays",
           "width": "Matrix-Breite in Pixeln (z.B. 32)",
-          "height": "Matrix-Höhe in Pixeln (z.B. 8)",
-          "bitmap_api_uuid": "Bitmap-API UUID (optional)"
+          "height": "Matrix-Höhe in Pixeln (z.B. 8)"
         }
       },
       "reconfigure": {
@@ -17,8 +16,7 @@
         "data": {
           "host": "IP-Adresse des PixelIt-Displays",
           "width": "Matrix-Breite in Pixeln (z.B. 32)",
-          "height": "Matrix-Höhe in Pixeln (z.B. 8)",
-          "bitmap_api_uuid": "Bitmap-API UUID (optional)"
+          "height": "Matrix-Höhe in Pixeln (z.B. 8)"
         }
       }
     },
@@ -147,6 +145,14 @@
         "icon_animation_delay": {
           "name": "Animationsgeschwindigkeit",
           "description": "Zeit zwischen Bildern in Millisekunden. Bei statischen Icons ohne Wirkung."
+        },
+        "transition": {
+          "name": "Übergang",
+          "description": "Effekt beim Einblenden. Erweiterte Effekte ab Firmware 3.0.0-beta.1, vertikales Schieben ab beta.6. Bei gespeicherten Anzeigen auch für Playlist-Wechsel."
+        },
+        "transition_bitmap": {
+          "name": "Bild für Bitmap-Wischeffekt",
+          "description": "Nur für Bitmap-Wischeffekt: Gallery-ID eines statischen Bildes. Unabhängig vom normalen Nachrichten-Icon."
         }
       },
       "sections": {
@@ -205,6 +211,14 @@
         "large_font": {
           "name": "Große Schrift",
           "description": "Große statt kleiner Schrift verwenden."
+        },
+        "transition": {
+          "name": "Übergang",
+          "description": "Effekt beim Einblenden. Erweiterte Effekte ab Firmware 3.0.0-beta.1, vertikales Schieben ab beta.6. Bei gespeicherten Anzeigen auch für Playlist-Wechsel."
+        },
+        "transition_bitmap": {
+          "name": "Bild für Bitmap-Wischeffekt",
+          "description": "Nur für Bitmap-Wischeffekt: Gallery-ID eines statischen Bildes. Unabhängig vom normalen Nachrichten-Icon."
         }
       },
       "sections": {
@@ -283,6 +297,14 @@
         "large_font": {
           "name": "Große Schrift",
           "description": "Große statt kleiner Schrift verwenden."
+        },
+        "transition": {
+          "name": "Übergang",
+          "description": "Effekt beim Einblenden. Erweiterte Effekte ab Firmware 3.0.0-beta.1, vertikales Schieben ab beta.6. Bei gespeicherten Anzeigen auch für Playlist-Wechsel."
+        },
+        "transition_bitmap": {
+          "name": "Bild für Bitmap-Wischeffekt",
+          "description": "Nur für Bitmap-Wischeffekt: Gallery-ID eines statischen Bildes. Unabhängig vom normalen Nachrichten-Icon."
         }
       },
       "sections": {
@@ -301,6 +323,23 @@
         "auto": "Automatisch",
         "always": "Immer",
         "off": "Aus"
+      }
+    },
+    "transition": {
+      "options": {
+        "none": "Keiner",
+        "random": "Zufällig",
+        "fade": "Überblenden",
+        "coloredBarWipe": "Farbbalken",
+        "zigzagWipe": "Zickzack",
+        "bitmapWipe": "Bitmap-Wischeffekt",
+        "curtain": "Vorhang",
+        "pixelDissolve": "Pixel auflösen",
+        "slide": "Horizontal schieben",
+        "blinds": "Jalousie",
+        "crt": "Röhrenmonitor",
+        "glitch": "Glitch",
+        "verticalSlide": "Vertikal schieben"
       }
     }
   }

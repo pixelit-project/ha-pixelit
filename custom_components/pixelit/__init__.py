@@ -43,7 +43,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: PixelItConfigEntry) -> b
         entry.data.get(CONF_HEIGHT, DEFAULT_HEIGHT),
     )
     entry.runtime_data.player.set_bitmap_library(
-        BitmapLibrary(entry.runtime_data.session, entry.data.get("bitmap_api_uuid", ""))
+        BitmapLibrary(entry.runtime_data.session)
     )
     await entry.runtime_data.player.async_load(
         Store(hass, 1, f"{DOMAIN}.{entry.entry_id}.screens")

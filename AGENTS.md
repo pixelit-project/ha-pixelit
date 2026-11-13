@@ -66,6 +66,10 @@ Identify any required firmware or external documentation follow-up explicitly.
 
 Keep README focused on end users: installation, setup and simple usage examples.
 Put protocol, architecture, memory limits and developer details in `docs/`.
+Maintain the integration's user documentation in `../PixelIt.Docs` under
+Home Assistant (`src/homeassistant.md`) as well. Update that documentation when
+integration changes affect installation, setup or usage, following the companion
+repository's `AGENTS.md` instructions.
 
 ## Validation
 

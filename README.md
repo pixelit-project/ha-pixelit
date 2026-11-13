@@ -55,7 +55,6 @@ The integration is configured via the **config flow** (HA UI), no YAML needed. W
 | **PixelIt display IP address** | The IP of your PixelIt (e.g. `192.168.178.8`) |
 | **Matrix width in pixels** | Width in pixels (e.g. `32`) |
 | **Matrix height in pixels** | Height in pixels (e.g. `8`) |
-| **Bitmap API UUID** | Optional UUID sent to the gallery API when resolving bitmap IDs |
 
 > Note: The labels are shown in German if your Home Assistant language is German, otherwise in English.
 
@@ -182,6 +181,41 @@ Without a playlist, the last content managed by this integration returns.
 If there is none, the display returns to its clock. A new notification replaces
 any previous notification. HA must stay running for the automatic return.
 Content sent by other apps cannot be restored automatically.
+
+### Choose a transition
+
+Messages, notifications and saved displays have a **Transition** dropdown. Choose
+**None** for an immediate change or an effect such as **Fade**, **Curtain**,
+**Horizontal slide** or **Random**.
+
+```yaml
+action: pixelit.show_alert
+target:
+  entity_id: light.your_pixelit_display
+data:
+  message: "Waschmaschine fertig"
+  duration: 10
+  transition: fade
+```
+
+Available choices are None, Random, Fade, Colored bar wipe, Zigzag wipe, Bitmap
+wipe, Curtain, Pixel dissolve, Horizontal slide, Blinds, CRT, Glitch and Vertical
+slide. **Zigzag wipe** uses the selected text color. **Bitmap wipe** additionally
+needs a static Gallery image: enter its ID under **Advanced → Bitmap wipe image**.
+This image is separate from your message icon.
+
+The effects are matched to the **PixelIt firmware 3.0.0 prerelease series**:
+Curtain, Pixel dissolve, Horizontal slide, Blinds, CRT and Glitch need
+**3.0.0-beta.1 or newer**; Vertical slide needs **3.0.0-beta.6 or newer**.
+All listed effects are implemented in **3.0.0-beta.6, beta.7 and rc.1**.
+If your connected firmware is too old or cannot be identified for one of the
+newer effects, the action reports a clear error instead of silently ignoring it.
+Random uses the mix provided by your device firmware and excludes Bitmap wipe.
+
+Choose a transition when saving a display to use it each time that display appears
+in a playlist or through **Show saved display**. After a notification, the restored
+display uses its own saved transition. To change an existing display's effect,
+save it again under the same name with a different transition.
 
 ### Rotate between displays
 

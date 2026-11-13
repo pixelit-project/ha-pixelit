@@ -12,6 +12,8 @@ from copy import deepcopy
 
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 
+from .transitions import TRANSITIONS
+
 _LOGGER = logging.getLogger(__name__)
 MAX_SCREENS = 100
 MAX_STORAGE_BYTES = 256 * 1024
@@ -148,8 +150,38 @@ def validate_screen(screen: dict, width: int, height: int) -> dict:
             delay = content.get("animationDelay")
             if type(delay) is not int or not 10 <= delay <= 60000:
                 raise ServiceValidationError("Animation delay must be 10–60000 ms")
-    if "switchAnimation" in screen and "data" in screen["switchAnimation"]:
-        raise ServiceValidationError("Bitmap-wipe transition data is not supported yet")
+    if "switchAnimation" in screen:
+        settings = screen["switchAnimation"]
+        if type(settings.get("aktiv", False)) is not bool:
+            raise ServiceValidationError("Transition aktiv must be a boolean")
+        if settings.get("aktiv"):
+            if settings.get("animation") not in TRANSITIONS[1:]:
+                raise ServiceValidationError("Unknown PixelIt transition")
+            if settings["animation"] == "bitmapWipe":
+                data, wipe_width = settings.get("data"), settings.get("width")
+                if (
+                    type(wipe_width) is not int
+                    or not 1 <= wipe_width <= width
+                    or wipe_width * height > 256
+                ):
+                    raise ServiceValidationError(
+                        "Bitmap Wipe width exceeds the display"
+                    )
+                if (
+                    not isinstance(data, list)
+                    or len(data) != wipe_width * height
+                    or any(
+                        type(pixel) is not int or not 0 <= pixel <= 65535
+                        for pixel in data
+                    )
+                ):
+                    raise ServiceValidationError(
+                        "Bitmap Wipe requires RGB565 pixels matching its width and display height"
+                    )
+            elif "data" in settings:
+                raise ServiceValidationError(
+                    "Only Bitmap Wipe accepts transition pixels"
+                )
     return deepcopy(screen)
 
 

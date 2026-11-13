@@ -7,6 +7,7 @@ from homeassistant.exceptions import ServiceValidationError
 
 from .content import build_screen
 from .entity import device_info
+from .transitions import with_transition
 
 PARALLEL_UPDATES = 0
 
@@ -70,6 +71,8 @@ class PixelItLight(LightEntity):
         protection_duration: float,
         icon: int | None = None,
         icon_animation_delay: int = 100,
+        transition: str | None = None,
+        transition_bitmap: int | None = None,
     ) -> None:
         """Wake separately: firmware ignores content alongside sleepMode."""
         screen = build_screen(
@@ -80,6 +83,7 @@ class PixelItLight(LightEntity):
             center=center,
             icon=icon,
         )
+        screen = with_transition(screen, transition, transition_bitmap, color)
         await self._coordinator.player.async_show_message(
             self._with_icon(screen, icon, icon_animation_delay),
             protection_duration,
@@ -104,6 +108,8 @@ class PixelItLight(LightEntity):
         duration: float = 5,
         icon: int | None = None,
         icon_animation_delay: int = 100,
+        transition: str | None = None,
+        transition_bitmap: int | None = None,
         message: str | None = None,
         clock: bool = False,
         color: str = "#FFFFFF",
@@ -121,6 +127,7 @@ class PixelItLight(LightEntity):
             center=center,
             icon=icon,
         )
+        screen = with_transition(screen, transition, transition_bitmap, color)
         await self._coordinator.player.async_set_screen(
             name, self._with_icon(screen, icon, icon_animation_delay), duration
         )
@@ -140,6 +147,8 @@ class PixelItLight(LightEntity):
         duration: float = 10,
         icon: int | None = None,
         icon_animation_delay: int = 100,
+        transition: str | None = None,
+        transition_bitmap: int | None = None,
         message: str | None = None,
         clock: bool = False,
         color: str = "#FFFFFF",
@@ -157,6 +166,7 @@ class PixelItLight(LightEntity):
             center=center,
             icon=icon,
         )
+        screen = with_transition(screen, transition, transition_bitmap, color)
         await self._coordinator.player.async_show_alert(
             self._with_icon(screen, icon, icon_animation_delay), duration
         )

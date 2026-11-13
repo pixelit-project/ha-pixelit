@@ -7,8 +7,7 @@
         "data": {
           "host": "PixelIt host",
           "width": "Matrix width in pixels",
-          "height": "Matrix height in pixels",
-          "bitmap_api_uuid": "Bitmap API UUID (optional)"
+          "height": "Matrix height in pixels"
         }
       },
       "reconfigure": {
@@ -17,8 +16,7 @@
         "data": {
           "host": "PixelIt host",
           "width": "Matrix width in pixels",
-          "height": "Matrix height in pixels",
-          "bitmap_api_uuid": "Bitmap API UUID (optional)"
+          "height": "Matrix height in pixels"
         }
       }
     },
@@ -147,6 +145,14 @@
         "icon_animation_delay": {
           "name": "Animation speed",
           "description": "Milliseconds between frames. Has no effect on static icons."
+        },
+        "transition": {
+          "name": "Transition",
+          "description": "Effect when content appears. Expanded effects need firmware 3.0.0-beta.1+, vertical slide beta.6+. Saved displays also use it during playlist rotation."
+        },
+        "transition_bitmap": {
+          "name": "Bitmap wipe image",
+          "description": "Only for Bitmap wipe: Gallery ID of a static image. Independent of the normal message icon."
         }
       },
       "sections": {
@@ -205,6 +211,14 @@
         "large_font": {
           "name": "Large font",
           "description": "Use the large font instead of the small font."
+        },
+        "transition": {
+          "name": "Transition",
+          "description": "Effect when content appears. Expanded effects need firmware 3.0.0-beta.1+, vertical slide beta.6+. Saved displays also use it during playlist rotation."
+        },
+        "transition_bitmap": {
+          "name": "Bitmap wipe image",
+          "description": "Only for Bitmap wipe: Gallery ID of a static image. Independent of the normal message icon."
         }
       },
       "sections": {
@@ -283,6 +297,14 @@
         "large_font": {
           "name": "Large font",
           "description": "Use the large font instead of the small font."
+        },
+        "transition": {
+          "name": "Transition",
+          "description": "Effect when content appears. Expanded effects need firmware 3.0.0-beta.1+, vertical slide beta.6+. Saved displays also use it during playlist rotation."
+        },
+        "transition_bitmap": {
+          "name": "Bitmap wipe image",
+          "description": "Only for Bitmap wipe: Gallery ID of a static image. Independent of the normal message icon."
         }
       },
       "sections": {
@@ -301,6 +323,23 @@
         "auto": "Automatic",
         "always": "Always",
         "off": "Off"
+      }
+    },
+    "transition": {
+      "options": {
+        "none": "None",
+        "random": "Random",
+        "fade": "Fade",
+        "coloredBarWipe": "Colored bar wipe",
+        "zigzagWipe": "Zigzag wipe",
+        "bitmapWipe": "Bitmap wipe",
+        "curtain": "Curtain",
+        "pixelDissolve": "Pixel dissolve",
+        "slide": "Horizontal slide",
+        "blinds": "Blinds",
+        "crt": "CRT",
+        "glitch": "Glitch",
+        "verticalSlide": "Vertical slide"
       }
     }
   }

@@ -10,6 +10,7 @@ from homeassistant.helpers import service
 
 from .const import DOMAIN
 from .screens import duration_seconds
+from .transitions import TRANSITIONS
 
 
 def seconds(value, *, allow_zero=False):
@@ -27,6 +28,10 @@ ICON_FIELDS = {
         int, vol.Range(min=10, max=60000)
     ),
 }
+TRANSITION_FIELDS = {
+    vol.Optional("transition"): vol.In(TRANSITIONS),
+    vol.Optional("transition_bitmap"): vol.All(int, vol.Range(min=1, max=2**31 - 1)),
+}
 TEXT_FIELDS = {
     vol.Optional("color", default="#FFFFFF"): vol.Match(r"^#[0-9A-Fa-f]{6}$"),
     vol.Optional("scroll", default="auto"): vol.In(["auto", "always", "off"]),
@@ -34,6 +39,7 @@ TEXT_FIELDS = {
     vol.Optional("center", default=True): cv.boolean,
 }
 CONTENT_FIELDS = {
+    **TRANSITION_FIELDS,
     **ICON_FIELDS,
     **TEXT_FIELDS,
     vol.Exclusive("message", "content"): vol.All(cv.string, vol.Length(min=1, max=255)),
@@ -41,6 +47,7 @@ CONTENT_FIELDS = {
     vol.Optional("clock", default=False): cv.boolean,
 }
 MESSAGE_FIELDS = {
+    **TRANSITION_FIELDS,
     **ICON_FIELDS,
     **TEXT_FIELDS,
     vol.Required("message"): vol.All(cv.string, vol.Length(min=1, max=255)),

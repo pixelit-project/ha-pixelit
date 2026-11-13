@@ -17,6 +17,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from yarl import URL
 
 from .screens import ScreenPlayer
+from .transitions import validate_firmware_transition
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -142,6 +143,8 @@ class PixelItCoordinator:
             ws = self._ws
             if self._stopping or ws is None or ws.closed:
                 raise HomeAssistantError("PixelIt is disconnected")
+            for screen in screens:
+                validate_firmware_transition(screen, self.info.get("pixelitVersion"))
             try:
                 for screen in screens:
                     if self._stopping:

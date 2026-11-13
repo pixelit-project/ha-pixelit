@@ -121,7 +121,7 @@ Supply RGB565 integer arrays as `bitmap.data`, or arrays of frames as
 also needs `animationDelay` in milliseconds. As in the Node-RED Core node,
 `data: 42` resolves gallery bitmap ID 42. Use `bitmapAnimation` for animated gallery
 entries. Missing gallery dimensions are inferred as 8×8 or 32×8. Gallery downloads
-use the PixelIt API and the optional configured API UUID, with a five-second
+use the PixelIt API without a configurable UUID, with a five-second
 timeout, a 128 KiB response limit, and a per-display LRU cache of at most 32 entries
 or 256 KiB. Invalid responses fail the action without changing active playback.
 Resolved pixels are stored with named screens, so rotation does not repeatedly
@@ -134,7 +134,7 @@ limits or silently truncate content. At most 100 named screens, 100 playlist
 entries and 256 KiB of stored content are allowed. Screen/alert durations are
 1–86,400 seconds. Smooth playback and ESP8266 peak memory still require device
 validation before release. Transition support depends on device firmware;
-bitmap-wipe transition data is currently rejected.
+bitmap-wipe data must be static RGB565 pixels matching its width and the configured display height.
 
 ## How it works
 
@@ -196,3 +196,35 @@ requests are introduced. Sensor subscribers do not receive live pixel updates.
 
 The card's entity selection and suggestions now check for Liveview attributes,
 so additional environmental or diagnostic sensors cannot displace Liveview.
+
+## Transition controls for firmware 3.0.0 prereleases
+
+`transition` is optional on `show_message`, `show_alert` and `set_screen`. Omitting
+it preserves an existing advanced `screen.switchAnimation`. Explicit `none`
+sets `aktiv: false`; other values set `aktiv: true` and the firmware effect name.
+An explicit selection replaces the advanced transition. `zigzagWipe` uses the
+flat `color` value as `hexColor`.
+
+`bitmapWipe` requires `transition_bitmap`, a static Gallery ID. HA resolves it
+through the bounded Gallery cache, infers width (8/32), and stores pixels for
+playlist reuse. Inline advanced wipe pixels remain accepted. Validation requires
+width within the configured matrix, one row per display row, RGB565 pixels and
+at most 256 wipe pixels, with the existing combined payload limit still applied.
+Animated wipe images are rejected. This adds no firmware buffer allocations or
+polling; the firmware performs the transition.
+
+Compatibility was checked locally at firmware tags `3.0.0-beta`, `.beta.0` through
+`.beta.7` and `3.0.0-rc.1` (the shorthand `.beta.N` means `3.0.0-beta.N`). The
+expanded effects begin at beta.1, verticalSlide at beta.6. Before every actual
+transmission, the coordinator checks `sysinfo.pixelitVersion`; this also protects
+stored playlists after a firmware downgrade. Saved configuration may contain an
+effect for a newer firmware, but attempting playback on an older device raises an
+error or pauses background playback. `random` is selected by the firmware, not HA.
+No arbitrary delays are added; alert/playlist duration still starts after command
+acknowledgement and includes the transition's runtime.
+
+No companion firmware change is required. Real-device frame timing and ESP8266
+peak-memory validation remain necessary before release.
+
+The former `bitmap_api_uuid` setting is no longer exposed or used. Existing
+config entries can retain that obsolete key without needing reconfiguration.

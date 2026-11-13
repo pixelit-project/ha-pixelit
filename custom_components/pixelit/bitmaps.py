@@ -19,9 +19,8 @@ MAX_CACHE_ENTRIES = 32
 class BitmapLibrary:
     """Bound downloads and the per-display LRU cache; do not retry implicitly."""
 
-    def __init__(self, session, uuid=""):
+    def __init__(self, session):
         self._session = session
-        self._uuid = uuid
         self._cache = OrderedDict()
         self._cache_bytes = 0
 
@@ -92,6 +91,21 @@ class BitmapLibrary:
                     "width": 32 if len(frames[0]) == 256 else 8,
                     "height": 8,
                 }
+        settings = result.get("switchAnimation")
+        if (
+            isinstance(settings, dict)
+            and settings.get("aktiv")
+            and settings.get("animation") == "bitmapWipe"
+        ):
+            data = settings.get("data")
+            if type(data) is int and 1 <= data <= 2**31 - 1:
+                frames = await self._fetch(data)
+                if len(frames) != 1:
+                    raise ServiceValidationError(
+                        "Bitmap Wipe requires a static bitmap, not an animation"
+                    )
+                settings["data"] = frames[0]
+                settings["width"] = 32 if len(frames[0]) == 256 else 8
         return result
 
     async def _fetch(self, bitmap_id):
@@ -103,7 +117,6 @@ class BitmapLibrary:
             async with asyncio.timeout(5):
                 async with self._session.get(
                     f"{API_URL}{bitmap_id}",
-                    params={"uuid": self._uuid},
                     allow_redirects=False,
                 ) as response:
                     if response.status != 200:

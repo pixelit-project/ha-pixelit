@@ -92,9 +92,6 @@ class PixelItConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_HEIGHT, default=DEFAULT_HEIGHT): vol.All(
                     int, vol.Range(min=1)
                 ),
-                vol.Optional("bitmap_api_uuid", default=""): vol.All(
-                    str, vol.Length(max=128)
-                ),
             }
         )
         return self.async_show_form(
