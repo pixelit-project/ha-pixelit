@@ -1,38 +1,45 @@
 # PixelIt
 
-A custom **Home Assistant integration** for direct display control, persistent playlists, temporary alerts, and a live mirror of the content of a [PixelIt](https://github.com/pixelit-project/PixelIt) matrix display — the clock, bitmaps, text, everything you see on the physical display — as a mini pixel grid on a Lovelace card.
+Control your [PixelIt](https://github.com/pixelit-project/PixelIt) LED matrix
+from Home Assistant: send messages, rotate saved screens, show temporary
+notifications and mirror the physical display on your dashboard.
 
-View and control your display through Home Assistant, including in the Companion App and remotely through Nabu Casa.
+The integration connects directly over WebSocket. MQTT and Node-RED are optional.
+The dashboard card also works in the Companion App and through your existing
+remote Home Assistant access, including Nabu Casa.
 
-This integration is maintained by the [PixelIt project](https://github.com/pixelit-project) in [pixelit-project/ha-pixelit](https://github.com/pixelit-project/ha-pixelit).
+Maintained by the [PixelIt project](https://github.com/pixelit-project).
 
 ## Features
 
-- **Direct control** — Power, brightness and messages over WebSocket, without MQTT
-- **Managed playback** — Persistent named screens, playlists and temporary alerts
-- **Gallery bitmaps** — Optional bitmap/animation IDs with bounded downloads and caching
+- **Display control** — Switch the matrix on or off and adjust brightness.
+- **Messages and notifications** — Choose text, color, static or animated Gallery icons and screen transitions in the action forms.
+- **Saved screens and playlists** — Keep named screens and playlists across Home Assistant restarts. Temporary alerts interrupt playback and then resume managed content.
+- **Liveview card** — Mirror the actual LED pixels with connection status, theme styling, optional transparency and responsive sizing.
+- **Device sensors** — Read environmental, ambient light and battery values when the device reports them; enable optional diagnostics as needed.
+- **UI setup** — Configure each display through Home Assistant, with automatic dashboard resource registration in storage mode.
+- **English and German** — Translated setup, entities, actions and card editor.
 
-- **Live pixel mirror** — Shows exactly what the PixelIt display is currently showing (rendered from the real LED pixels, ~250ms updates)
-- **Works over Nabu Casa / remote** — Uses a HA sensor, not a direct device WebSocket, so it works in the Companion App and from outside your LAN
-- **Self-healing connection** — Automatically reconnects if the PixelIt WebSocket goes stale (e.g. after a color change in the PixelIt WebUI)
-- **Automatic card registration** — The Lovelace card is registered as a resource automatically, no manual setup
-- **Config flow** — Configure IP and matrix size via the HA UI, no YAML editing
-- **Theme-compatible** — Follows your HA theme, with an optional transparent background
-- **Connection status badge** — Shows "Connected" / "Disconnected"
-- **Multi-language** — English and German UI (auto-detects HA language)
+![PixelIt card showing live LED pixels and connection status](images/screenshot-dashboard.png)
 
-![PixelIt Liveview Card in the dashboard](images/screenshot-dashboard.png)
+*Liveview card in Home Assistant's card preview, using a connected PixelIt display.*
+
+## Requirements
+
+- Home Assistant **2025.10 or newer**.
+- A PixelIt display reachable from Home Assistant on WebSocket port **81**.
+- [PixelIt firmware 3.0.0](https://github.com/pixelit-project/PixelIt/releases/tag/3.0.0) for the current stable firmware and all listed transitions. Older firmware may support fewer effects.
+- Internet access from Home Assistant when downloading Gallery icons. Direct display control and Liveview use the local connection.
 
 ## Installation
 
 ### Marketplace / HACS (recommended)
 
-1. Add `https://github.com/pixelit-project/ha-pixelit` as a custom repository in Marketplace (HACS on earlier Home Assistant versions) as an **Integration**
-2. Install
-3. Restart Home Assistant
-4. **Settings → Devices & Services → Add Integration → PixelIt**
-5. Enter the PixelIt IP and matrix size
-6. Add the card to your dashboard (it's auto-registered as a resource)
+1. Open Marketplace / HACS and add `https://github.com/pixelit-project/ha-pixelit` as a **custom repository** with type **Integration**.
+2. Download **PixelIt** and restart Home Assistant.
+3. Open **Settings → Devices & services → Add integration → PixelIt**.
+4. Enter the display's IP address and matrix dimensions (for example, `32` × `8`).
+5. Edit your dashboard, choose **Add card → PixelIt**, select the display's **Liveview** sensor and save.
 
 ### Manual
 
@@ -45,8 +52,6 @@ This integration is maintained by the [PixelIt project](https://github.com/pixel
 In storage mode, the integration registers the dashboard resource automatically and updates the old `/local/pixelit-liveview-card.js` resource on upgrade. If your dashboard resources are managed in YAML, set the resource URL to `/pixelit/pixelit-card.js` with type `module`.
 
 ## Configuration
-
-Requires Home Assistant 2025.10 or newer.
 
 The integration is configured via the **config flow** (HA UI), no YAML needed. When you add the integration you are asked for:
 
@@ -64,7 +69,7 @@ To change the address or dimensions, open the PixelIt integration entry and choo
 
 ### Card Options
 
-Choose your PixelIt sensor, set an optional title and select what to show. The
+Choose your PixelIt **Liveview** sensor, set an optional title and select what to show. The
 connection status can stay visible even when the title is hidden. Matrix size is
 detected automatically. Pixel spacing is under **Advanced** and adapts on narrow
 cards. Enable **Transparent background** to use the earlier frameless appearance.
@@ -79,7 +84,21 @@ cards. Enable **Transparent background** to use the earlier frameless appearance
 | `show_pixels` | bool | true | Show the pixel grid |
 | `transparent` | bool | false | Hide the card background and border |
 
-![PixelIt Liveview Card editor](images/screenshot-editor.png)
+![PixelIt card editor with Liveview sensor selection, visibility switches and advanced pixel spacing](images/screenshot-editor.png)
+
+*Current editor in German; labels follow your Home Assistant language.*
+
+For a manually configured card, replace the entity below with your Liveview sensor:
+
+```yaml
+type: custom:pixelit-card
+entity: sensor.your_pixelit_liveview
+title: PixelIt
+show_status: true
+```
+
+Use a separate standard Home Assistant light card for power and brightness;
+the PixelIt card mirrors the display.
 
 ## Upgrading from PixelIt Liveview
 
@@ -152,7 +171,7 @@ action: pixelit.show_message
 target:
   entity_id: light.your_pixelit_display
 data:
-  message: "Waschmaschine fertig"
+  message: "Washing machine finished"
   icon: 42
   color: "#00FF00"
 ```
@@ -173,7 +192,7 @@ target:
 data:
   icon: 42
   duration: 10
-  message: "Waschmaschine fertig"
+  message: "Washing machine finished"
   color: "#00FF00"
 ```
 
@@ -193,7 +212,7 @@ action: pixelit.show_alert
 target:
   entity_id: light.your_pixelit_display
 data:
-  message: "Waschmaschine fertig"
+  message: "Washing machine finished"
   duration: 10
   transition: fade
 ```
@@ -204,13 +223,12 @@ slide. **Zigzag wipe** uses the selected text color. **Bitmap wipe** additionall
 needs a static Gallery image: enter its ID under **Advanced → Bitmap wipe image**.
 This image is separate from your message icon.
 
-The effects are matched to the **PixelIt firmware 3.0.0 prerelease series**:
-Curtain, Pixel dissolve, Horizontal slide, Blinds, CRT and Glitch need
-**3.0.0-beta.1 or newer**; Vertical slide needs **3.0.0-beta.6 or newer**.
-All listed effects are implemented in **3.0.0-beta.6, beta.7 and rc.1**.
-If your connected firmware is too old or cannot be identified for one of the
-newer effects, the action reports a clear error instead of silently ignoring it.
-Random uses the mix provided by your device firmware and excludes Bitmap wipe.
+All listed effects are available in stable **PixelIt firmware 3.0.0**.
+For older prereleases, Curtain, Pixel dissolve, Horizontal slide, Blinds, CRT and
+Glitch require **3.0.0-beta.1 or newer**; Vertical slide requires
+**3.0.0-beta.6 or newer**. An unsupported or unidentified firmware version produces
+an action error for these effects. Random uses the mix provided by your firmware
+and excludes Bitmap wipe.
 
 Choose a transition when saving a display to use it each time that display appears
 in a playlist or through **Show saved display**. After a notification, the restored
@@ -241,7 +259,7 @@ data:
   name: welcome
   duration: 5
   icon: 42
-  message: "Willkommen"
+  message: "Welcome"
 ```
 
 Start your playlist with the names you saved:
@@ -256,7 +274,9 @@ data:
 
 The clock appears for ten seconds, then the welcome message for five seconds.
 The playlist repeats until stopped. Screens and playlists survive an HA restart;
-rotation pauses while the display is off or disconnected.
+rotation pauses while the display is off or disconnected. Saved screens contain
+the values from the time they were saved. To keep a sensor value current, update
+its saved screen from an automation when that value changes.
 
 - **`pixelit.show_screen`**, with `name`: show one saved display and stop rotation.
 - **`pixelit.stop_playlist`**: stop rotation and leave the current content visible.
@@ -272,6 +292,20 @@ for this protection field; update those `show_message` calls.
 
 See the [technical reference](docs/technical-reference.md) for advanced screen
 options, supported limits and implementation details.
+
+## Troubleshooting
+
+| Problem | What to check |
+|---------|---------------|
+| Setup cannot connect | Confirm the IP address and that Home Assistant can reach port 81 on the display. |
+| PixelIt card is missing | Check the dashboard resource. Storage mode registers it automatically; YAML mode needs `/pixelit/pixelit-card.js` with type `module`. Refresh the browser after an update. |
+| Card is empty or shows the wrong display | Select the matching **Liveview** sensor, rather than an environmental or diagnostic sensor. Check its connection state. |
+| Gallery icon fails to load | Check the numeric Gallery ID and Home Assistant's internet connection. Invalid or oversized images are rejected. |
+| Transition reports an error | Check the installed firmware version; stable 3.0.0 supports all listed effects. Bitmap wipe requires a separate static Gallery image. |
+| Content changes unexpectedly | Check for Node-RED, MQTT, WebUI commands or firmware clock fallback replacing the content. |
+
+For advanced options and limits, see the [technical reference](docs/technical-reference.md).
+For development and host test instructions, see [tests/README.md](tests/README.md).
 
 ## Credits
 

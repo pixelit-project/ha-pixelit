@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Refresh README screenshots from Home Assistant, setup instructions, stable firmware compatibility, card examples and troubleshooting.
+
 - Fix Hassfest translation validation by using lowercase transition selector keys while preserving firmware names and existing action calls.
 
 - Remove the optional Gallery API UUID setting from setup and reconfiguration.
