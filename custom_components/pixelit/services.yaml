@@ -63,6 +63,18 @@ show_message:
     advanced_options:
       collapsed: true
       fields:
+        icon_rubberbanding:
+          default: false
+          selector:
+            boolean: null
+        icon_limit_loops:
+          default: 0
+          selector:
+            number:
+              min: 0
+              max: 2147483647
+              step: 1
+              mode: box
         icon_animation_delay:
           default: 100
           selector:
@@ -168,6 +180,18 @@ set_screen:
     advanced_options:
       collapsed: true
       fields:
+        icon_rubberbanding:
+          default: false
+          selector:
+            boolean: null
+        icon_limit_loops:
+          default: 0
+          selector:
+            number:
+              min: 0
+              max: 2147483647
+              step: 1
+              mode: box
         icon_animation_delay:
           default: 100
           selector:
@@ -289,6 +313,18 @@ show_alert:
     advanced_options:
       collapsed: true
       fields:
+        icon_rubberbanding:
+          default: false
+          selector:
+            boolean: null
+        icon_limit_loops:
+          default: 0
+          selector:
+            number:
+              min: 0
+              max: 2147483647
+              step: 1
+              mode: box
         icon_animation_delay:
           default: 100
           selector:

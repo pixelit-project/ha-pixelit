@@ -118,7 +118,12 @@ acknowledgement. Avoid firmware protection when using HA playlist/alert timers.
 
 Supply RGB565 integer arrays as `bitmap.data`, or arrays of frames as
 `bitmapAnimation.data`, with optional `size: {width: 8, height: 8}`. An animation
-also needs `animationDelay` in milliseconds. As in the Node-RED Core node,
+also needs `animationDelay` in milliseconds. Optional `rubberbanding` (Boolean)
+plays frames back and forth. Optional `limitLoops` is an integer from 0 to
+2,147,483,647: 0 repeats indefinitely, a positive count limits playback. These
+firmware options do not change HA screen or alert duration. For Gallery icons,
+use action fields `icon_rubberbanding` and `icon_limit_loops` (defaults false and 0),
+or the same fields alongside `icon` in an advanced screen object. As in the Node-RED Core node,
 `data: 42` resolves gallery bitmap ID 42. Use `bitmapAnimation` for animated gallery
 entries. Missing gallery dimensions are inferred as 8×8 or 32×8. Gallery downloads
 use the PixelIt API without a configurable UUID, with a five-second

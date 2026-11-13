@@ -239,6 +239,38 @@ class PlaybackTests(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(HAError):
             await self.player.async_set_screen("x" * 65, text("bad"))
 
+    async def test_animation_options_validation_and_playback(self):
+        for rubberbanding in (False, True):
+            for loops in (0, 3, 2**31 - 1):
+                screen = {
+                    "bitmapAnimation": {
+                        "data": [[0] * 64, [65535] * 64],
+                        "animationDelay": 100,
+                        "rubberbanding": rubberbanding,
+                        "limitLoops": loops,
+                    }
+                }
+                await self.player.async_set_screen("animation", screen)
+                await self.player.async_show_screen("animation")
+                self.assertEqual(self.sent[-1], screen)
+                self.assertEqual(self.player.screens["animation"]["screen"], screen)
+        for key, values in (
+            ("rubberbanding", (0, 1, "true", None)),
+            ("limitLoops", (-1, True, 1.5, "3", None, 2**31)),
+        ):
+            for value in values:
+                with self.subTest(key=key, value=value), self.assertRaises(HAError):
+                    await self.player.async_set_screen(
+                        "bad",
+                        {
+                            "bitmapAnimation": {
+                                "data": [[0] * 64],
+                                "animationDelay": 100,
+                                key: value,
+                            }
+                        },
+                    )
+
     async def test_updating_screen_changes_next_playlist_turn(self):
         await self.player.async_set_playlist(["one"])
         await self.player.async_set_screen("one", text("UPDATED"), 7)

@@ -153,6 +153,14 @@
         "transition_bitmap": {
           "name": "Bild für Bitmap-Wischeffekt",
           "description": "Nur für Bitmap-Wischeffekt: Gallery-ID eines statischen Bildes. Unabhängig vom normalen Nachrichten-Icon."
+        },
+        "icon_rubberbanding": {
+          "name": "Animation vor und zurück",
+          "description": "Spielt animierte Galerie-Icons abwechselnd vorwärts und rückwärts ab. Ohne Wirkung bei statischen Icons."
+        },
+        "icon_limit_loops": {
+          "name": "Animationswiederholungen",
+          "description": "0 wiederholt unbegrenzt; eine positive Zahl begrenzt die Wiedergabe. Ohne Wirkung bei statischen Icons. Ändert nicht die Alert-Dauer."
         }
       },
       "sections": {
@@ -219,6 +227,14 @@
         "transition_bitmap": {
           "name": "Bild für Bitmap-Wischeffekt",
           "description": "Nur für Bitmap-Wischeffekt: Gallery-ID eines statischen Bildes. Unabhängig vom normalen Nachrichten-Icon."
+        },
+        "icon_rubberbanding": {
+          "name": "Animation vor und zurück",
+          "description": "Spielt animierte Galerie-Icons abwechselnd vorwärts und rückwärts ab. Ohne Wirkung bei statischen Icons."
+        },
+        "icon_limit_loops": {
+          "name": "Animationswiederholungen",
+          "description": "0 wiederholt unbegrenzt; eine positive Zahl begrenzt die Wiedergabe. Ohne Wirkung bei statischen Icons. Ändert nicht die Alert-Dauer."
         }
       },
       "sections": {
@@ -305,6 +321,14 @@
         "transition_bitmap": {
           "name": "Bild für Bitmap-Wischeffekt",
           "description": "Nur für Bitmap-Wischeffekt: Gallery-ID eines statischen Bildes. Unabhängig vom normalen Nachrichten-Icon."
+        },
+        "icon_rubberbanding": {
+          "name": "Animation vor und zurück",
+          "description": "Spielt animierte Galerie-Icons abwechselnd vorwärts und rückwärts ab. Ohne Wirkung bei statischen Icons."
+        },
+        "icon_limit_loops": {
+          "name": "Animationswiederholungen",
+          "description": "0 wiederholt unbegrenzt; eine positive Zahl begrenzt die Wiedergabe. Ohne Wirkung bei statischen Icons. Ändert nicht die Alert-Dauer."
         }
       },
       "sections": {

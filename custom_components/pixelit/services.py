@@ -24,6 +24,10 @@ def seconds(value, *, allow_zero=False):
 NAME = vol.All(cv.string, vol.Length(min=1, max=64))
 ICON_FIELDS = {
     vol.Optional("icon"): vol.All(int, vol.Range(min=1, max=2**31 - 1)),
+    vol.Optional("icon_rubberbanding", default=False): bool,
+    vol.Optional("icon_limit_loops", default=0): vol.All(
+        int, vol.Range(min=0, max=2**31 - 1)
+    ),
     vol.Optional("icon_animation_delay", default=100): vol.All(
         int, vol.Range(min=10, max=60000)
     ),

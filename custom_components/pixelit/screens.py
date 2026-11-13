@@ -150,6 +150,18 @@ def validate_screen(screen: dict, width: int, height: int) -> dict:
             delay = content.get("animationDelay")
             if type(delay) is not int or not 10 <= delay <= 60000:
                 raise ServiceValidationError("Animation delay must be 10–60000 ms")
+            if (
+                "rubberbanding" in content
+                and type(content["rubberbanding"]) is not bool
+            ):
+                raise ServiceValidationError("rubberbanding must be a boolean")
+            if "limitLoops" in content and (
+                type(content["limitLoops"]) is not int
+                or not 0 <= content["limitLoops"] <= 2**31 - 1
+            ):
+                raise ServiceValidationError(
+                    "limitLoops must be an integer from 0 to 2147483647"
+                )
     if "switchAnimation" in screen:
         settings = screen["switchAnimation"]
         if type(settings.get("aktiv", False)) is not bool:

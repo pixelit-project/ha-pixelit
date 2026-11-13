@@ -71,6 +71,8 @@ class PixelItLight(LightEntity):
         protection_duration: float,
         icon: int | None = None,
         icon_animation_delay: int = 100,
+        icon_rubberbanding: bool = False,
+        icon_limit_loops: int = 0,
         transition: str | None = None,
         transition_bitmap: int | None = None,
     ) -> None:
@@ -85,7 +87,9 @@ class PixelItLight(LightEntity):
         )
         screen = with_transition(screen, transition, transition_bitmap, color)
         await self._coordinator.player.async_show_message(
-            self._with_icon(screen, icon, icon_animation_delay),
+            self._with_icon(
+                screen, icon, icon_animation_delay, icon_rubberbanding, icon_limit_loops
+            ),
             protection_duration,
         )
 
@@ -108,6 +112,8 @@ class PixelItLight(LightEntity):
         duration: float = 5,
         icon: int | None = None,
         icon_animation_delay: int = 100,
+        icon_rubberbanding: bool = False,
+        icon_limit_loops: int = 0,
         transition: str | None = None,
         transition_bitmap: int | None = None,
         message: str | None = None,
@@ -129,7 +135,11 @@ class PixelItLight(LightEntity):
         )
         screen = with_transition(screen, transition, transition_bitmap, color)
         await self._coordinator.player.async_set_screen(
-            name, self._with_icon(screen, icon, icon_animation_delay), duration
+            name,
+            self._with_icon(
+                screen, icon, icon_animation_delay, icon_rubberbanding, icon_limit_loops
+            ),
+            duration,
         )
 
     async def async_show_screen(self, name: str) -> None:
@@ -147,6 +157,8 @@ class PixelItLight(LightEntity):
         duration: float = 10,
         icon: int | None = None,
         icon_animation_delay: int = 100,
+        icon_rubberbanding: bool = False,
+        icon_limit_loops: int = 0,
         transition: str | None = None,
         transition_bitmap: int | None = None,
         message: str | None = None,
@@ -168,15 +180,30 @@ class PixelItLight(LightEntity):
         )
         screen = with_transition(screen, transition, transition_bitmap, color)
         await self._coordinator.player.async_show_alert(
-            self._with_icon(screen, icon, icon_animation_delay), duration
+            self._with_icon(
+                screen, icon, icon_animation_delay, icon_rubberbanding, icon_limit_loops
+            ),
+            duration,
         )
 
     @staticmethod
-    def _with_icon(screen: dict, icon: int | None, delay: int) -> dict:
+    def _with_icon(
+        screen: dict,
+        icon: int | None,
+        delay: int,
+        rubberbanding: bool = False,
+        limit_loops: int = 0,
+    ) -> dict:
         if icon is None:
             return screen
         if "icon" in screen:
             raise ServiceValidationError(
                 "Specify icon on the action or inside screen, not both"
             )
-        return {**screen, "icon": icon, "icon_animation_delay": delay}
+        return {
+            **screen,
+            "icon": icon,
+            "icon_animation_delay": delay,
+            "icon_rubberbanding": rubberbanding,
+            "icon_limit_loops": limit_loops,
+        }

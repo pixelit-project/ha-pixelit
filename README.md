@@ -179,6 +179,9 @@ data:
 Replace `42` with your icon ID. This message stays on the display and stops an
 active playlist. For animated icons, you can optionally set
 `icon_animation_delay: 100` to change the time between frames in milliseconds.
+`icon_rubberbanding: true` plays frames back and forth; `icon_limit_loops: 3`
+limits playback to three loops (`0` repeats indefinitely). These options are also
+available under **Advanced options** and have no effect on static icons.
 Icons are downloaded when needed, so Gallery icons require internet access.
 
 ### Show a temporary notification

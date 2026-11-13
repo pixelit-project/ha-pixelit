@@ -39,6 +39,12 @@ class BitmapLibrary:
             delay = result.pop("icon_animation_delay", 100)
             if type(delay) is not int or not 10 <= delay <= 60000:
                 raise ServiceValidationError("Icon animation delay must be 10–60000 ms")
+            rubberbanding = result.pop("icon_rubberbanding", False)
+            loops = result.pop("icon_limit_loops", 0)
+            if type(rubberbanding) is not bool:
+                raise ServiceValidationError("Icon rubberbanding must be a boolean")
+            if type(loops) is not int or not 0 <= loops <= 2**31 - 1:
+                raise ServiceValidationError("Icon loop limit must be 0–2147483647")
             position = result.pop("icon_position", {"x": 0, "y": 0})
             if (
                 not isinstance(position, dict)
@@ -58,13 +64,26 @@ class BitmapLibrary:
                 content["data"] = frames[0]
                 result["bitmap"] = content
             else:
-                content.update(data=frames, animationDelay=delay)
+                content.update(
+                    data=frames,
+                    animationDelay=delay,
+                    rubberbanding=rubberbanding,
+                    limitLoops=loops,
+                )
                 result["bitmapAnimation"] = content
             if isinstance(result.get("text"), dict):
                 result["text"].setdefault(
                     "position", {"x": position["x"] + width + 1, "y": 1}
                 )
-        elif "icon_animation_delay" in result or "icon_position" in result:
+        elif any(
+            key in result
+            for key in (
+                "icon_animation_delay",
+                "icon_position",
+                "icon_rubberbanding",
+                "icon_limit_loops",
+            )
+        ):
             raise ServiceValidationError("Icon options require an icon ID")
         for key in ("bitmap", "bitmapAnimation"):
             content = result.get(key)

@@ -119,13 +119,23 @@ class BitmapTests(unittest.IsolatedAsyncioTestCase):
             {"id": 43, "rgB565Array": ",".join([json.dumps([0] * 64)] * 2)}
         ).encode()
         animated = await library.async_resolve(
-            {"icon": 43, "icon_animation_delay": 80, "icon_position": {"x": 1, "y": 0}}
+            {
+                "icon": 43,
+                "icon_animation_delay": 80,
+                "icon_position": {"x": 1, "y": 0},
+                "icon_rubberbanding": True,
+                "icon_limit_loops": 3,
+            }
         )
         self.assertNotIn("bitmap", animated)
         self.assertEqual(animated["bitmapAnimation"]["animationDelay"], 80)
         self.assertEqual(animated["bitmapAnimation"]["position"], {"x": 1, "y": 0})
         cached = await library.async_resolve({"icon": 43})
         self.assertEqual(cached["bitmapAnimation"]["animationDelay"], 100)
+        self.assertTrue(animated["bitmapAnimation"]["rubberbanding"])
+        self.assertEqual(animated["bitmapAnimation"]["limitLoops"], 3)
+        self.assertFalse(cached["bitmapAnimation"]["rubberbanding"])
+        self.assertEqual(cached["bitmapAnimation"]["limitLoops"], 0)
         self.assertEqual(session.calls, 2)
 
     async def test_shared_icon_rejects_conflicts_and_invalid_options(self):
@@ -139,6 +149,13 @@ class BitmapTests(unittest.IsolatedAsyncioTestCase):
             {"icon": 42, "icon_animation_delay": 0},
             {"icon": 42, "icon_position": {"x": 0}},
             {"icon_animation_delay": 100},
+            {"icon_rubberbanding": True},
+            {"icon_limit_loops": 3},
+            {"icon": 42, "icon_rubberbanding": "true"},
+            *(
+                {"icon": 42, "icon_limit_loops": value}
+                for value in (-1, True, 1.5, "3", 2**31)
+            ),
         ):
             with self.assertRaises(HAError):
                 await library.async_resolve(screen)

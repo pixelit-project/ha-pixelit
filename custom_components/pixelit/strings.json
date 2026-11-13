@@ -153,6 +153,14 @@
         "transition_bitmap": {
           "name": "Bitmap wipe image",
           "description": "Only for Bitmap wipe: Gallery ID of a static image. Independent of the normal message icon."
+        },
+        "icon_rubberbanding": {
+          "name": "Back-and-forth animation",
+          "description": "Play animated Gallery icons forwards and backwards. Has no effect on static icons."
+        },
+        "icon_limit_loops": {
+          "name": "Animation loop limit",
+          "description": "0 repeats indefinitely; a positive count limits playback. Has no effect on static icons. Does not change alert duration."
         }
       },
       "sections": {
@@ -219,6 +227,14 @@
         "transition_bitmap": {
           "name": "Bitmap wipe image",
           "description": "Only for Bitmap wipe: Gallery ID of a static image. Independent of the normal message icon."
+        },
+        "icon_rubberbanding": {
+          "name": "Back-and-forth animation",
+          "description": "Play animated Gallery icons forwards and backwards. Has no effect on static icons."
+        },
+        "icon_limit_loops": {
+          "name": "Animation loop limit",
+          "description": "0 repeats indefinitely; a positive count limits playback. Has no effect on static icons. Does not change alert duration."
         }
       },
       "sections": {
@@ -305,6 +321,14 @@
         "transition_bitmap": {
           "name": "Bitmap wipe image",
           "description": "Only for Bitmap wipe: Gallery ID of a static image. Independent of the normal message icon."
+        },
+        "icon_rubberbanding": {
+          "name": "Back-and-forth animation",
+          "description": "Play animated Gallery icons forwards and backwards. Has no effect on static icons."
+        },
+        "icon_limit_loops": {
+          "name": "Animation loop limit",
+          "description": "0 repeats indefinitely; a positive count limits playback. Has no effect on static icons. Does not change alert duration."
         }
       },
       "sections": {
