@@ -35,6 +35,80 @@
       "display": {
         "name": "Display"
       }
+    },
+    "sensor": {
+      "temperature": {
+        "name": "Temperature"
+      },
+      "humidity": {
+        "name": "Humidity"
+      },
+      "pressure": {
+        "name": "Pressure"
+      },
+      "gas_resistance": {
+        "name": "Gas resistance"
+      },
+      "illuminance": {
+        "name": "Illuminance"
+      },
+      "battery": {
+        "name": "Battery"
+      },
+      "wifi_signal": {
+        "name": "Wi-Fi signal"
+      },
+      "wifi_quality": {
+        "name": "Wi-Fi quality"
+      },
+      "cpu_frequency": {
+        "name": "CPU frequency"
+      },
+      "wifi_ssid": {
+        "name": "Wi-Fi SSID"
+      },
+      "wifi_bssid": {
+        "name": "Wi-Fi BSSID"
+      },
+      "chip_id": {
+        "name": "Chip ID"
+      },
+      "uptime": {
+        "name": "Uptime"
+      },
+      "free_heap": {
+        "name": "Free memory"
+      },
+      "restart_reason": {
+        "name": "Restart reason"
+      },
+      "ip_address": {
+        "name": "IP address"
+      },
+      "firmware_version": {
+        "name": "Firmware version"
+      },
+      "latest_firmware_version": {
+        "name": "Latest firmware version"
+      },
+      "free_flash": {
+        "name": "Free flash memory"
+      },
+      "firmware_size": {
+        "name": "Firmware size"
+      },
+      "largest_free_block": {
+        "name": "Largest free memory block"
+      },
+      "minimum_free_heap": {
+        "name": "Minimum free memory"
+      },
+      "heap_fragmentation": {
+        "name": "Heap fragmentation"
+      },
+      "animation_frames": {
+        "name": "Animation frames"
+      }
     }
   },
   "services": {

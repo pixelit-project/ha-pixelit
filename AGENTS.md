@@ -43,6 +43,14 @@ lifecycle patterns.
   Validate bitmap and animation content against device capabilities and reject
   invalid or oversized data instead of silently truncating it.
 
+## Sensor coverage
+
+Expose device-provided environmental, battery and diagnostic readings directly
+through the integration, without requiring MQTT. Discover optional hardware from
+reported values, respect the firmware temperature unit, and keep sensor updates
+independent of live pixels. Diagnostics should be disabled initially. Keep card
+selection limited to the Liveview sensor as more sensor entities are added.
+
 ## Related repositories and device constraints
 
 Firmware and device protocol handlers live in `../PixelIt`; Node-RED behavior in

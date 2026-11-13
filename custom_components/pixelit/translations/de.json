@@ -35,6 +35,80 @@
       "display": {
         "name": "Display"
       }
+    },
+    "sensor": {
+      "temperature": {
+        "name": "Temperatur"
+      },
+      "humidity": {
+        "name": "Luftfeuchtigkeit"
+      },
+      "pressure": {
+        "name": "Luftdruck"
+      },
+      "gas_resistance": {
+        "name": "Gaswiderstand"
+      },
+      "illuminance": {
+        "name": "Beleuchtungsstärke"
+      },
+      "battery": {
+        "name": "Akku"
+      },
+      "wifi_signal": {
+        "name": "WLAN-Signal"
+      },
+      "wifi_quality": {
+        "name": "WLAN-Qualität"
+      },
+      "cpu_frequency": {
+        "name": "CPU-Takt"
+      },
+      "wifi_ssid": {
+        "name": "WLAN-SSID"
+      },
+      "wifi_bssid": {
+        "name": "WLAN-BSSID"
+      },
+      "chip_id": {
+        "name": "Chip-ID"
+      },
+      "uptime": {
+        "name": "Laufzeit"
+      },
+      "free_heap": {
+        "name": "Freier Arbeitsspeicher"
+      },
+      "restart_reason": {
+        "name": "Neustartgrund"
+      },
+      "ip_address": {
+        "name": "IP-Adresse"
+      },
+      "firmware_version": {
+        "name": "Firmware-Version"
+      },
+      "latest_firmware_version": {
+        "name": "Neueste Firmware-Version"
+      },
+      "free_flash": {
+        "name": "Freier Flash-Speicher"
+      },
+      "firmware_size": {
+        "name": "Firmware-Größe"
+      },
+      "largest_free_block": {
+        "name": "Größter freier Speicherblock"
+      },
+      "minimum_free_heap": {
+        "name": "Niedrigster freier Arbeitsspeicher"
+      },
+      "heap_fragmentation": {
+        "name": "Speicherfragmentierung"
+      },
+      "animation_frames": {
+        "name": "Animationsbilder"
+      }
     }
   },
   "services": {

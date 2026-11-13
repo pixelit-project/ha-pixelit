@@ -75,3 +75,13 @@ test('sizing follows actual height and status-only cards need less space',()=>{
  instance.getBoundingClientRect=()=>({height:220});assert.equal(instance.getCardSize(),5);
  assert.equal(instance.getGridOptions().rows,'auto');
 });
+
+test('diagnostic and environmental sensors are excluded from Liveview selection',()=>{
+ const withReadings={...hass,entities:{...hass.entities,'sensor.temp':{entity_id:'sensor.temp',platform:'pixelit'}},states:{...hass.states,'sensor.temp':{state:'22',attributes:{unit_of_measurement:'°C'}}}};
+ assert.equal(Card.getStubConfig(withReadings).entity,'sensor.live');
+ const suggest=context.window.customCards[0].getEntitySuggestion;
+ assert.equal(suggest(withReadings,'sensor.temp'),null);
+ assert.equal(suggest(withReadings,'sensor.live').config.entity,'sensor.live');
+ const editor=new Editor();editor.hass=withReadings;editor.setConfig({entity:'sensor.live'});editor.render();
+ assert.deepEqual(Array.from(editor._schema[0].selector.entity.include_entities),['sensor.live']);
+});

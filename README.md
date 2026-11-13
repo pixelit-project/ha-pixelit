@@ -59,7 +59,7 @@ The integration is configured via the **config flow** (HA UI), no YAML needed. W
 
 > Note: The labels are shown in German if your Home Assistant language is German, otherwise in English.
 
-Each display has its own sensor. Home Assistant derives new entity IDs from the display name. Registered entity IDs stay the same. The card editor preselects the sensor when exactly one PixelIt sensor is available. If you have several displays, choose the matching sensor.
+Each display has its own Liveview sensor. Home Assistant derives new entity IDs from the display name. Registered entity IDs stay the same. The card editor preselects the sensor when exactly one PixelIt Liveview sensor is available. If you have several displays, choose the matching sensor.
 
 To change the address or dimensions, open the PixelIt integration entry and choose **Reconfigure**. Existing cards retain their sensor assignment.
 
@@ -72,7 +72,7 @@ cards. Enable **Transparent background** to use the earlier frameless appearance
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `entity` | string | Automatically selected when exactly one PixelIt sensor is available | Sensor exposing the liveview data |
+| `entity` | string | Automatically selected when exactly one PixelIt Liveview sensor is available | Sensor exposing the liveview data |
 | `gap` | int | 1 | Pixel spacing, 0–16; found under Advanced |
 | `title` | string | `PixelIt` | Card title |
 | `show_header` | bool | true | Show card title |
@@ -102,6 +102,25 @@ be updated manually. New dashboards use `custom:pixelit-card` and the resource
 `/pixelit/pixelit-card.js`. Check the selected sensor after adding the integration.
 This is a manual migration; existing device and entity registry IDs are not
 transferred automatically.
+
+## Sensors
+
+The integration includes readings from your display without needing MQTT:
+
+- Temperature, humidity, air pressure and gas resistance, depending on the installed sensor.
+- Ambient light level.
+- Battery level on displays with battery support.
+
+Only sensors reported by the device are added. Values become unavailable if the
+display disconnects or a measurement is invalid. Temperature follows the device's
+Celsius/Fahrenheit setting and is displayed in your preferred HA unit.
+
+Wi-Fi signal and quality, network information, uptime, CPU frequency, firmware
+versions and memory information are also available as diagnostic entities.
+These are disabled initially to keep your device page and history focused.
+Open your PixelIt device and enable the diagnostic entities you need.
+Hardware-specific memory values appear only on devices that provide them.
+If MQTT Discovery is also active, its sensors remain separate entities.
 
 ## Controlling your display
 

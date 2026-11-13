@@ -47,6 +47,9 @@ class PixelItCoordinator:
         self._command_lock = asyncio.Lock()
         self._response = None
         self.info: dict = {}
+        self.sensor_data: dict = {}
+        self.temperature_unit: int | None = None
+        self._data_listeners: set[Callable[[], None]] = set()
         self._control_listeners: set[Callable[[], None]] = set()
         self._hex = ""
         self._had_data = False
@@ -108,6 +111,21 @@ class PixelItCoordinator:
             "hex": self._hex,
         }
 
+    def add_data_listener(self, listener: Callable[[], None]) -> Callable[[], None]:
+        """Subscribe to device information and readings, never pixel frames."""
+        self._data_listeners.add(listener)
+        return lambda: self._data_listeners.discard(listener)
+
+    def _publish_data(self) -> None:
+        for listener in tuple(self._data_listeners):
+            listener()
+
+    def _clear_device_data(self) -> None:
+        self.info = {}
+        self.sensor_data = {}
+        self.temperature_unit = None
+        self._publish_data()
+
     def add_control_listener(self, listener: Callable[[], None]) -> Callable[[], None]:
         """Subscribe to state changes without publishing every pixel frame."""
         self._control_listeners.add(listener)
@@ -162,7 +180,7 @@ class PixelItCoordinator:
                 if self._connected:
                     self._connected = False
                     self._ws = None
-                    self.info = {}
+                    self._clear_device_data()
                     if self._response is not None and not self._response.done():
                         self._response.set_exception(
                             HomeAssistantError("PixelIt disconnected")
@@ -175,7 +193,7 @@ class PixelItCoordinator:
         """Run a single WebSocket connection until it is stale, closed, or errors."""
         async with self._session.ws_connect(self.ws_url) as ws:
             self._ws = ws
-            self.info = {}
+            self._clear_device_data()
             self._connected = True
             self._publish_controls()
             self._had_data = False
@@ -221,6 +239,23 @@ class PixelItCoordinator:
         if isinstance(obj.get("sysinfo"), dict):
             self.info = obj["sysinfo"]
             self._publish_controls()
+            self._publish_data()
+        if isinstance(obj.get("sensor"), dict):
+            readings = {
+                key: value
+                for key, value in obj["sensor"].items()
+                if key
+                in {"temperature", "humidity", "pressure", "gas", "lux", "battery"}
+            }
+            if readings:
+                self.sensor_data.update(readings)
+                self._publish_data()
+        if isinstance(obj.get("config"), dict) and "temperatureUnit" in obj["config"]:
+            unit = obj["config"]["temperatureUnit"]
+            self.temperature_unit = (
+                unit if type(unit) is int and unit in (0, 1) else None
+            )
+            self._publish_data()
         if not isinstance(obj.get("liveview"), str):
             return
         frame = obj["liveview"][: self._width * self._height * 6]

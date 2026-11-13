@@ -174,3 +174,25 @@ color picking, preserving the existing hexadecimal `color` field. Text appearanc
 and advanced payloads live in collapsed sections. Sections do not change the
 flat action data structure. The playlist selector now edits a list of names via
 `text.multiple`; the existing `screens: [clock, weather]` format stays valid.
+
+## Device sensors
+
+Sensor readings use the existing `sensor` WebSocket envelopes; illuminance and
+physical sensor messages are merged by field. Diagnostic readings use `sysinfo`.
+Only `temperatureUnit` is read from `config`; configuration secrets are not retained.
+Celsius/Fahrenheit comes from enum values 0/1. Temperature stays unavailable until
+its unit is known. Reconnect clears readings and unit metadata before fresh state.
+
+Entities are discovered lazily for firmware fields that are actually reported,
+excluding `Not installed`. Environment sensors use measurement state classes,
+correct native units and device classes. The BME680 gas reading is resistance in
+kΩ, not a VOC concentration. Diagnostics are disabled by default. Diagnostic
+coverage includes MQTT-discovered fields plus IP address, firmware versions,
+board-specific flash/heap values and animation frame count. Board-specific values
+are only created when present. Each entity has a stable per-entry unique ID.
+Invalid values (including booleans, non-finite numbers, impossible percentages and
+overlong text) are unavailable. Updates are push-only; no extra polling or device
+requests are introduced. Sensor subscribers do not receive live pixel updates.
+
+The card's entity selection and suggestions now check for Liveview attributes,
+so additional environmental or diagnostic sensors cannot displace Liveview.

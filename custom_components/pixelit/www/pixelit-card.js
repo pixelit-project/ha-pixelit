@@ -3,6 +3,15 @@ const CARD_NAME="pixelit-card";
 const CARD_TYPE="custom:"+CARD_NAME;
 const EDITOR_TAG=CARD_NAME+"-editor";
 const PIXELIT_ENTITY_SELECTOR={entity:{filter:[{domain:"sensor",integration:"pixelit"}]}};
+function isLiveviewSensor(hass,id){
+  const attributes=hass?.states?.[id]?.attributes;
+  return id.startsWith("sensor.")&&hass?.entities?.[id]?.platform==="pixelit"
+    &&attributes&&("hex" in attributes||"pixels" in attributes)
+    &&Number.isInteger(attributes.width)&&Number.isInteger(attributes.height);
+}
+function liveviewEntities(hass){
+  return Object.keys(hass?.entities??{}).filter(id=>isLiveviewSensor(hass,id));
+}
 
 // ===== i18n =====
 const I18N={
@@ -39,8 +48,10 @@ let PLEditor=class extends re{
   render(){
     if(!this._config||!this.hass)return V``;
     const language=getLang(this.hass);
-    const schema=this._schemaLanguage===language?this._schema:[
-      {name:"entity",required:true,selector:PIXELIT_ENTITY_SELECTOR},
+    const ids=liveviewEntities(this.hass);
+    const entityKey=ids.join(";");
+    const schema=this._schemaLanguage===language&&this._schemaEntities===entityKey?this._schema:[
+      {name:"entity",required:true,selector:{entity:{...PIXELIT_ENTITY_SELECTOR.entity,include_entities:ids}}},
       {name:"title",selector:{text:{}}},
       {name:"show_header",selector:{boolean:{}}},
       {name:"show_status",selector:{boolean:{}}},
@@ -52,6 +63,7 @@ let PLEditor=class extends re{
     ];
     this._schema=schema;
     this._schemaLanguage=language;
+    this._schemaEntities=entityKey;
     return V`<ha-form .hass=${this.hass} .data=${this._config} .schema=${schema}
       .computeLabel=${this._computeLabel} @value-changed=${this._valueChanged}></ha-form>`;
   }
@@ -81,10 +93,8 @@ let PixelItLiveviewCard=class extends re{
     return document.createElement(EDITOR_TAG);
   }
   static getStubConfig(hass){
-    const sensors=Object.values(hass?.entities??{}).filter(
-      entry=>entry.entity_id.startsWith("sensor.")&&entry.platform==="pixelit"&&hass.states?.[entry.entity_id]
-    );
-    const entity=sensors.length===1?sensors[0].entity_id:"";
+    const sensors=liveviewEntities(hass);
+    const entity=sensors.length===1?sensors[0]:"";
     return{...CARD_DEFAULTS,entity};
   }
 
@@ -200,7 +210,7 @@ window.customCards.push({
   configurable:true,
   show_form_editors:true,
   getEntitySuggestion(hass,entityId){
-    if(!entityId.startsWith("sensor.")||hass.entities?.[entityId]?.platform!=="pixelit"){
+    if(!isLiveviewSensor(hass,entityId)){
       return null;
     }
     return{config:{type:CARD_TYPE,entity:entityId}};

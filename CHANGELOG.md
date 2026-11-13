@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add push-based environment, battery and diagnostic sensors without MQTT, with automatic hardware detection and Liveview-only card selection.
+
 - Add simple text, color and clock controls for saved displays and alerts, with collapsible advanced options and an easy playlist list editor.
 
 ## 2.0.0 — 2026-11-13
