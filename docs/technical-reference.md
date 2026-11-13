@@ -228,3 +228,8 @@ peak-memory validation remain necessary before release.
 
 The former `bitmap_api_uuid` setting is no longer exposed or used. Existing
 config entries can retain that obsolete key without needing reconfiguration.
+
+HA transition selector values use snake_case, for example `vertical_slide` and
+`bitmap_wipe`. They map to firmware `verticalSlide` and `bitmapWipe` internally.
+Legacy CamelCase action values remain accepted; advanced firmware payloads and
+stored screens retain their original wire names.

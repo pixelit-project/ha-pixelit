@@ -10,7 +10,7 @@ from homeassistant.helpers import service
 
 from .const import DOMAIN
 from .screens import duration_seconds
-from .transitions import TRANSITIONS
+from .transitions import TRANSITION_OPTIONS, TRANSITIONS
 
 
 def seconds(value, *, allow_zero=False):
@@ -29,7 +29,7 @@ ICON_FIELDS = {
     ),
 }
 TRANSITION_FIELDS = {
-    vol.Optional("transition"): vol.In(TRANSITIONS),
+    vol.Optional("transition"): vol.In((*TRANSITION_OPTIONS, *TRANSITIONS)),
     vol.Optional("transition_bitmap"): vol.All(int, vol.Range(min=1, max=2**31 - 1)),
 }
 TEXT_FIELDS = {

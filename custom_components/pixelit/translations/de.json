@@ -330,16 +330,16 @@
         "none": "Keiner",
         "random": "Zufällig",
         "fade": "Überblenden",
-        "coloredBarWipe": "Farbbalken",
-        "zigzagWipe": "Zickzack",
-        "bitmapWipe": "Bitmap-Wischeffekt",
+        "colored_bar_wipe": "Farbbalken",
+        "zigzag_wipe": "Zickzack",
+        "bitmap_wipe": "Bitmap-Wischeffekt",
         "curtain": "Vorhang",
-        "pixelDissolve": "Pixel auflösen",
+        "pixel_dissolve": "Pixel auflösen",
         "slide": "Horizontal schieben",
         "blinds": "Jalousie",
         "crt": "Röhrenmonitor",
         "glitch": "Glitch",
-        "verticalSlide": "Vertikal schieben"
+        "vertical_slide": "Vertikal schieben"
       }
     }
   }

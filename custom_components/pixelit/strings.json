@@ -330,16 +330,16 @@
         "none": "None",
         "random": "Random",
         "fade": "Fade",
-        "coloredBarWipe": "Colored bar wipe",
-        "zigzagWipe": "Zigzag wipe",
-        "bitmapWipe": "Bitmap wipe",
+        "colored_bar_wipe": "Colored bar wipe",
+        "zigzag_wipe": "Zigzag wipe",
+        "bitmap_wipe": "Bitmap wipe",
         "curtain": "Curtain",
-        "pixelDissolve": "Pixel dissolve",
+        "pixel_dissolve": "Pixel dissolve",
         "slide": "Horizontal slide",
         "blinds": "Blinds",
         "crt": "CRT",
         "glitch": "Glitch",
-        "verticalSlide": "Vertical slide"
+        "vertical_slide": "Vertical slide"
       }
     }
   }

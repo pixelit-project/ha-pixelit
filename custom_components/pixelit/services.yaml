@@ -29,16 +29,16 @@ show_message:
           - none
           - random
           - fade
-          - coloredBarWipe
-          - zigzagWipe
-          - bitmapWipe
+          - colored_bar_wipe
+          - zigzag_wipe
+          - bitmap_wipe
           - curtain
-          - pixelDissolve
+          - pixel_dissolve
           - slide
           - blinds
           - crt
           - glitch
-          - verticalSlide
+          - vertical_slide
           translation_key: transition
     text_options:
       collapsed: true
@@ -134,16 +134,16 @@ set_screen:
           - none
           - random
           - fade
-          - coloredBarWipe
-          - zigzagWipe
-          - bitmapWipe
+          - colored_bar_wipe
+          - zigzag_wipe
+          - bitmap_wipe
           - curtain
-          - pixelDissolve
+          - pixel_dissolve
           - slide
           - blinds
           - crt
           - glitch
-          - verticalSlide
+          - vertical_slide
           translation_key: transition
     text_options:
       collapsed: true
@@ -255,16 +255,16 @@ show_alert:
           - none
           - random
           - fade
-          - coloredBarWipe
-          - zigzagWipe
-          - bitmapWipe
+          - colored_bar_wipe
+          - zigzag_wipe
+          - bitmap_wipe
           - curtain
-          - pixelDissolve
+          - pixel_dissolve
           - slide
           - blinds
           - crt
           - glitch
-          - verticalSlide
+          - vertical_slide
           translation_key: transition
     text_options:
       collapsed: true

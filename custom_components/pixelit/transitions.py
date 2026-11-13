@@ -22,6 +22,22 @@ TRANSITIONS = (
     "glitch",
     "verticalSlide",
 )
+# HA selector translation keys are lowercase; firmware wire names are unchanged.
+TRANSITION_OPTIONS = {
+    "none": "none",
+    "random": "random",
+    "fade": "fade",
+    "colored_bar_wipe": "coloredBarWipe",
+    "zigzag_wipe": "zigzagWipe",
+    "bitmap_wipe": "bitmapWipe",
+    "curtain": "curtain",
+    "pixel_dissolve": "pixelDissolve",
+    "slide": "slide",
+    "blinds": "blinds",
+    "crt": "crt",
+    "glitch": "glitch",
+    "vertical_slide": "verticalSlide",
+}
 EXPANDED_TRANSITIONS = {"curtain", "pixelDissolve", "slide", "blinds", "crt", "glitch"}
 VERSION = re.compile(r"v?(\d+)\.(\d+)\.(\d+)(?:-(beta|rc)(?:\.(\d+))?)?(?:\+[^\s]+)?")
 
@@ -35,6 +51,7 @@ def with_transition(
         if bitmap is not None:
             raise ServiceValidationError("A transition bitmap requires Bitmap Wipe")
         return result
+    transition = TRANSITION_OPTIONS.get(transition, transition)
     if transition not in TRANSITIONS:
         raise ServiceValidationError("Unknown PixelIt transition")
     if bitmap is not None and transition != "bitmapWipe":

@@ -51,3 +51,21 @@ class ActionFormTests(unittest.TestCase):
             {"text": {"multiple": True}},
         )
         self.assertNotIn("fields", descriptions["stop_playlist"])
+
+    def test_selector_option_keys_match_ha_translation_rules(self):
+        import re
+
+        descriptions = yaml.safe_load((ROOT / "services.yaml").read_text())
+        for language in ("en", "de"):
+            strings = json.loads((ROOT / f"translations/{language}.json").read_text())
+            for action in descriptions.values():
+                for field in flatten(action.get("fields", {})).values():
+                    selector = field.get("selector", {}).get("select", {})
+                    key = selector.get("translation_key")
+                    if key:
+                        translated = strings["selector"][key]["options"]
+                        self.assertEqual(set(selector["options"]), set(translated))
+                        for option in translated:
+                            self.assertIsNotNone(
+                                re.fullmatch(r"[a-z0-9]+(?:[-_][a-z0-9]+)*", option)
+                            )

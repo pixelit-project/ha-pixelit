@@ -187,3 +187,29 @@ class TransitionTests(unittest.IsolatedAsyncioTestCase):
                 )
             )
         self.assertEqual(self.ws.sent, [])
+
+    async def test_ha_selector_keys_and_legacy_names_use_same_wire_payload(self):
+        for schema_name in ("show_message", "show_alert", "set_screen"):
+            schema = vol.Schema(services.ACTION_SCHEMAS[schema_name])
+            for public, wire in transitions.TRANSITION_OPTIONS.items():
+                base = {"message": "Hello", "transition": public}
+                if schema_name == "set_screen":
+                    base["name"] = "hello"
+                if public == "bitmap_wipe":
+                    base["transition_bitmap"] = 42
+                data = schema(base)
+                actual = transitions.with_transition(
+                    {"text": {"textString": "Hello"}},
+                    data["transition"],
+                    data.get("transition_bitmap"),
+                    "#FFFFFF",
+                )
+                legacy = transitions.with_transition(
+                    {"text": {"textString": "Hello"}},
+                    wire,
+                    data.get("transition_bitmap"),
+                    "#FFFFFF",
+                )
+                self.assertEqual(actual, legacy)
+                if public != "none":
+                    self.assertEqual(actual["switchAnimation"]["animation"], wire)

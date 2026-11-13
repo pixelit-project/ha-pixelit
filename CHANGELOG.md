@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Fix Hassfest translation validation by using lowercase transition selector keys while preserving firmware names and existing action calls.
+
 - Remove the optional Gallery API UUID setting from setup and reconfiguration.
 
 - Add transition selectors, static Gallery bitmap wipes and firmware 3.0.0 prerelease compatibility checks for messages, alerts and saved displays.
