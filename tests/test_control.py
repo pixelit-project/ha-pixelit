@@ -281,7 +281,7 @@ class ControlTests(unittest.IsolatedAsyncioTestCase):
                 animation = self.ws.sent[-1]["setScreen"]["bitmapAnimation"]
                 self.assertIs(animation["rubberbanding"], True)
                 self.assertEqual(animation["limitLoops"], 3)
-                await self.client.player.async_stop()
+                await self.light.async_stop_playlist()
                 for field, value in (
                     ("icon_rubberbanding", "true"),
                     ("icon_limit_loops", True),
@@ -291,6 +291,7 @@ class ControlTests(unittest.IsolatedAsyncioTestCase):
                 ):
                     with self.assertRaises(vol.Invalid):
                         schema({**data, field: value})
+        await self.client.player.async_stop()
 
     async def test_ambiguous_or_empty_content_does_not_send(self):
         for action in ("show_alert", "set_screen"):

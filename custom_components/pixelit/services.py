@@ -21,13 +21,18 @@ def seconds(value, *, allow_zero=False):
         raise vol.Invalid(str(err)) from err
 
 
+def loop_count(value):
+    """Keep loop counts within the firmware's signed 32-bit integer range."""
+    if type(value) is not int or not 0 <= value <= 2**31 - 1:
+        raise vol.Invalid("Loop limit must be an integer from 0 to 2147483647")
+    return value
+
+
 NAME = vol.All(cv.string, vol.Length(min=1, max=64))
 ICON_FIELDS = {
     vol.Optional("icon"): vol.All(int, vol.Range(min=1, max=2**31 - 1)),
     vol.Optional("icon_rubberbanding", default=False): bool,
-    vol.Optional("icon_limit_loops", default=0): vol.All(
-        int, vol.Range(min=0, max=2**31 - 1)
-    ),
+    vol.Optional("icon_limit_loops", default=0): loop_count,
     vol.Optional("icon_animation_delay", default=100): vol.All(
         int, vol.Range(min=10, max=60000)
     ),
