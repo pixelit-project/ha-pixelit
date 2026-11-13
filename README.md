@@ -4,6 +4,8 @@ A custom **Home Assistant integration** that mirrors the live content of a [Pixe
 
 Unlike a naive direct-connection approach, this reads the display content **through Home Assistant**, so it works everywhere: on the desktop, in the Companion App over **Nabu Casa (remote/https)**, and on any network.
 
+This integration is maintained by the [PixelIt project](https://github.com/pixelit-project) in [pixelit-project/ha-pixelit](https://github.com/pixelit-project/ha-pixelit).
+
 ## Features
 
 - **Live pixel mirror** — Shows exactly what the PixelIt display is currently showing (rendered from the real LED pixels, ~250ms updates)
@@ -21,7 +23,7 @@ Unlike a naive direct-connection approach, this reads the display content **thro
 
 ### Marketplace / HACS (recommended)
 
-1. Add this repo as a custom repository in Marketplace (HACS on earlier Home Assistant versions) as an **Integration**
+1. Add `https://github.com/pixelit-project/ha-pixelit` as a custom repository in Marketplace (HACS on earlier Home Assistant versions) as an **Integration**
 2. Install
 3. Restart Home Assistant
 4. **Settings → Devices & Services → Add Integration → PixelIt Liveview**
@@ -75,6 +77,14 @@ To change the address, port, or dimensions, open the PixelIt Liveview integratio
 3. The integration validates the frame and publishes it as the sensor’s `hex` attribute.
 4. The card decodes the frame and renders the pixels as a grid, stretching to fill the card width while keeping pixels square.
 
+## Credits
+
+Special thanks to [Pissbirne](https://github.com/Pissbirne), the original creator, for the idea and initial implementation of PixelIt Liveview. Their work on [pixelit-liveview-card](https://github.com/Pissbirne/pixelit-liveview-card) laid the foundation for this integration, which is now maintained and developed further by the PixelIt project.
+
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE). Original copyright notices are preserved.
+
+## Support
+
+Report bugs and request features in the [issue tracker](https://github.com/pixelit-project/ha-pixelit/issues).
