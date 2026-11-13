@@ -27,13 +27,23 @@ ICON_FIELDS = {
         int, vol.Range(min=10, max=60000)
     ),
 }
-MESSAGE_FIELDS = {
-    **ICON_FIELDS,
-    vol.Required("message"): vol.All(cv.string, vol.Length(min=1, max=255)),
+TEXT_FIELDS = {
     vol.Optional("color", default="#FFFFFF"): vol.Match(r"^#[0-9A-Fa-f]{6}$"),
     vol.Optional("scroll", default="auto"): vol.In(["auto", "always", "off"]),
     vol.Optional("large_font", default=False): cv.boolean,
     vol.Optional("center", default=True): cv.boolean,
+}
+CONTENT_FIELDS = {
+    **ICON_FIELDS,
+    **TEXT_FIELDS,
+    vol.Exclusive("message", "content"): vol.All(cv.string, vol.Length(min=1, max=255)),
+    vol.Exclusive("screen", "content"): dict,
+    vol.Optional("clock", default=False): cv.boolean,
+}
+MESSAGE_FIELDS = {
+    **ICON_FIELDS,
+    **TEXT_FIELDS,
+    vol.Required("message"): vol.All(cv.string, vol.Length(min=1, max=255)),
     vol.Optional("protection_duration", default=0): lambda value: seconds(
         value, allow_zero=True
     ),
@@ -41,9 +51,8 @@ MESSAGE_FIELDS = {
 ACTION_SCHEMAS = {
     "show_message": MESSAGE_FIELDS,
     "set_screen": {
-        **ICON_FIELDS,
+        **CONTENT_FIELDS,
         vol.Required("name"): NAME,
-        vol.Required("screen"): dict,
         vol.Optional("duration", default=5): seconds,
     },
     "show_screen": {vol.Required("name"): NAME},
@@ -52,8 +61,7 @@ ACTION_SCHEMAS = {
     },
     "stop_playlist": {},
     "show_alert": {
-        **ICON_FIELDS,
-        vol.Required("screen"): dict,
+        **CONTENT_FIELDS,
         vol.Optional("duration", default=10): seconds,
     },
 }

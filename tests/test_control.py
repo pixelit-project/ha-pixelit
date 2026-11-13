@@ -206,6 +206,71 @@ class ControlTests(unittest.IsolatedAsyncioTestCase):
             with self.assertRaises(vol.Invalid):
                 schema(data)
 
+    async def test_friendly_alert_fields_become_screen_content(self):
+        data = vol.Schema(services.ACTION_SCHEMAS["show_alert"])(
+            {
+                "message": "Fertig",
+                "color": "#123456",
+                "scroll": "off",
+                "large_font": True,
+                "center": False,
+                "duration": 10,
+            }
+        )
+        await self.light.async_show_alert(**data)
+        text = self.ws.sent[-1]["setScreen"]["text"]
+        self.assertEqual(text["textString"], "Fertig")
+        self.assertEqual(text["hexColor"], "#123456")
+        self.assertIs(text["scrollText"], False)
+        self.assertIs(text["bigFont"], True)
+        self.assertIs(text["centerText"], False)
+        await self.client.player.async_stop()
+
+    async def test_friendly_saved_text_and_clock(self):
+        schema = vol.Schema(services.ACTION_SCHEMAS["set_screen"])
+        await self.light.async_set_screen(
+            **schema({"name": "welcome", "message": "Hallo"})
+        )
+        self.assertEqual(
+            self.client.player.screens["welcome"]["screen"]["text"]["hexColor"],
+            "#FFFFFF",
+        )
+        await self.light.async_set_screen(
+            **schema({"name": "clock", "clock": True, "color": "#00FF00"})
+        )
+        self.assertEqual(
+            self.client.player.screens["clock"]["screen"],
+            {"clock": {"show": True, "hexColor": "#00FF00"}},
+        )
+
+    async def test_advanced_content_remains_compatible(self):
+        screen = {
+            "text": {
+                "textString": "Legacy",
+                "hexColor": "#CC0000",
+                "position": {"x": 3, "y": 1},
+            }
+        }
+        data = vol.Schema(services.ACTION_SCHEMAS["show_alert"])({"screen": screen})
+        await self.light.async_show_alert(**data)
+        self.assertEqual(self.ws.sent[-1]["setScreen"], screen)
+        await self.client.player.async_stop()
+
+    async def test_ambiguous_or_empty_content_does_not_send(self):
+        for action in ("show_alert", "set_screen"):
+            schema = vol.Schema(services.ACTION_SCHEMAS[action])
+            base = {"name": "test"} if action == "set_screen" else {}
+            with self.assertRaises(vol.Invalid):
+                schema(
+                    {**base, "message": "hello", "screen": {"clock": {"show": True}}}
+                )
+            for values in ({}, {"message": "hello", "clock": True}):
+                with self.assertRaises(HAError):
+                    await getattr(self.light, "async_" + action)(
+                        **schema({**base, **values})
+                    )
+        self.assertEqual(self.ws.sent, [])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -44,11 +44,11 @@
       "fields": {
         "message": {
           "name": "Nachricht",
-          "description": "Anzuzeigender Text (1–255 Zeichen)."
+          "description": "Text eingeben. Ein Gallery-Icon kann daneben angezeigt werden."
         },
         "color": {
           "name": "Textfarbe",
-          "description": "Textfarbe als #RRGGBB."
+          "description": "Farbe auswählen. Standard ist Weiß. Gilt bei der Uhr für die Uhrfarbe."
         },
         "scroll": {
           "name": "Scrollmodus",
@@ -74,19 +74,27 @@
           "name": "Animationsgeschwindigkeit",
           "description": "Zeit zwischen Bildern in Millisekunden. Bei statischen Icons ohne Wirkung."
         }
+      },
+      "sections": {
+        "text_options": {
+          "name": "Textdarstellung"
+        },
+        "advanced_options": {
+          "name": "Erweitert"
+        }
       }
     },
     "set_screen": {
-      "name": "Screen speichern",
+      "name": "Anzeige speichern",
       "description": "Speichert oder aktualisiert einen benannten Screen. Die laufende Anzeige ändert sich beim nächsten Wechsel.",
       "fields": {
         "name": {
           "name": "Name",
-          "description": "Eindeutiger Screen-Name (1–64 Zeichen)."
+          "description": "Name für die Anzeige, zum Beispiel wetter oder uhr. Diesen Namen später in der Playlist verwenden."
         },
         "screen": {
-          "name": "Inhalt",
-          "description": "PixelIt-Screen-Objekt mit Text, Uhr, Bitmap oder Animation."
+          "name": "Eigener Screen (YAML)",
+          "description": "Nur für komplexe Anzeigen. Alternativ zu Nachricht oder Uhr verwenden. Bestehende Screen-Objekte bleiben unterstützt."
         },
         "duration": {
           "name": "Anzeigedauer",
@@ -99,16 +107,48 @@
         "icon_animation_delay": {
           "name": "Animationsgeschwindigkeit",
           "description": "Zeit zwischen Bildern in Millisekunden. Bei statischen Icons ohne Wirkung."
+        },
+        "message": {
+          "name": "Nachricht",
+          "description": "Text eingeben. Ein Gallery-Icon kann daneben angezeigt werden."
+        },
+        "color": {
+          "name": "Textfarbe",
+          "description": "Farbe auswählen. Standard ist Weiß. Gilt bei der Uhr für die Uhrfarbe."
+        },
+        "clock": {
+          "name": "Uhr anzeigen",
+          "description": "Anstelle einer Nachricht die Uhr verwenden. Das Nachrichtenfeld dann leer lassen."
+        },
+        "scroll": {
+          "name": "Scrollmodus",
+          "description": "Automatisch, immer oder aus."
+        },
+        "center": {
+          "name": "Zentrieren",
+          "description": "Text horizontal zentrieren."
+        },
+        "large_font": {
+          "name": "Große Schrift",
+          "description": "Große statt kleiner Schrift verwenden."
+        }
+      },
+      "sections": {
+        "text_options": {
+          "name": "Textdarstellung"
+        },
+        "advanced_options": {
+          "name": "Erweitert"
         }
       }
     },
     "show_screen": {
-      "name": "Screen anzeigen",
+      "name": "Gespeicherte Anzeige anzeigen",
       "description": "Zeigt einen gespeicherten Screen dauerhaft und stoppt die Playlist.",
       "fields": {
         "name": {
           "name": "Name",
-          "description": "Name eines gespeicherten Screens."
+          "description": "Name der zuvor gespeicherten Anzeige eingeben."
         }
       }
     },
@@ -118,7 +158,7 @@
       "fields": {
         "screens": {
           "name": "Screens",
-          "description": "Geordnete Liste gespeicherter Screen-Namen. Eine leere Liste stoppt die Rotation."
+          "description": "Gespeicherte Anzeigen in der gewünschten Reihenfolge einzeln hinzufügen. Keine YAML-Liste nötig. Eine leere Liste stoppt die Playlist."
         }
       }
     },
@@ -127,12 +167,12 @@
       "description": "Stoppt die Rotation und einen aktiven Alert-Timer. Der aktuelle Inhalt bleibt sichtbar."
     },
     "show_alert": {
-      "name": "Alert anzeigen",
+      "name": "Benachrichtigung anzeigen",
       "description": "Unterbricht die Playlist vorübergehend. Danach folgt der nächste Screen, die letzte verwaltete Anzeige oder die Uhr. Ein neuer Alert ersetzt den vorherigen.",
       "fields": {
         "screen": {
-          "name": "Inhalt",
-          "description": "PixelIt-Screen-Objekt des Alerts, zum Beispiel text.textString und text.hexColor."
+          "name": "Eigener Screen (YAML)",
+          "description": "Nur für komplexe Anzeigen. Alternativ zu Nachricht oder Uhr verwenden. Bestehende Screen-Objekte bleiben unterstützt."
         },
         "duration": {
           "name": "Anzeigedauer",
@@ -145,7 +185,48 @@
         "icon_animation_delay": {
           "name": "Animationsgeschwindigkeit",
           "description": "Zeit zwischen Bildern in Millisekunden. Bei statischen Icons ohne Wirkung."
+        },
+        "message": {
+          "name": "Nachricht",
+          "description": "Text eingeben. Ein Gallery-Icon kann daneben angezeigt werden."
+        },
+        "color": {
+          "name": "Textfarbe",
+          "description": "Farbe auswählen. Standard ist Weiß. Gilt bei der Uhr für die Uhrfarbe."
+        },
+        "clock": {
+          "name": "Uhr anzeigen",
+          "description": "Anstelle einer Nachricht die Uhr verwenden. Das Nachrichtenfeld dann leer lassen."
+        },
+        "scroll": {
+          "name": "Scrollmodus",
+          "description": "Automatisch, immer oder aus."
+        },
+        "center": {
+          "name": "Zentrieren",
+          "description": "Text horizontal zentrieren."
+        },
+        "large_font": {
+          "name": "Große Schrift",
+          "description": "Große statt kleiner Schrift verwenden."
         }
+      },
+      "sections": {
+        "text_options": {
+          "name": "Textdarstellung"
+        },
+        "advanced_options": {
+          "name": "Erweitert"
+        }
+      }
+    }
+  },
+  "selector": {
+    "scroll": {
+      "options": {
+        "auto": "Automatisch",
+        "always": "Immer",
+        "off": "Aus"
       }
     }
   }

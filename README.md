@@ -109,6 +109,20 @@ The **Display** entity lets you switch PixelIt on or off and adjust brightness.
 No MQTT setup is needed. You can use the actions below in HA automations and
 scripts. Replace `light.your_pixelit_display` with your Display entity.
 
+### Use the action forms
+
+In **Developer tools → Actions**, or in an automation, select a PixelIt action and
+choose your display. For messages, notifications and saved displays, enter the
+text directly, select a color with the color picker and optionally add a Gallery
+icon. No screen YAML is needed. **Show clock** lets you save a clock instead.
+
+**Text appearance** contains scrolling, large font and centering. **Advanced**
+contains animation speed and the optional custom screen editor. In **Start
+playlist**, add the saved display names individually in the desired order.
+**Show saved display** only needs its name; **Stop playlist** only needs a target.
+
+The examples below are optional for users who prefer YAML.
+
 ### Send a message with an icon
 
 Choose an icon in the PixelIt gallery and copy its numeric ID. Set `icon` to that
@@ -141,11 +155,8 @@ target:
 data:
   icon: 42
   duration: 10
-  screen:
-    text:
-      textString: "Waschmaschine fertig"
-      hexColor: "#00FF00"
-      scrollText: auto
+  message: "Waschmaschine fertig"
+  color: "#00FF00"
 ```
 
 Without a playlist, the last content managed by this integration returns.
@@ -164,9 +175,7 @@ target:
 data:
   name: clock
   duration: 10
-  screen:
-    clock:
-      show: true
+  clock: true
 ```
 
 Then store a text display with an icon:
@@ -179,9 +188,7 @@ data:
   name: welcome
   duration: 5
   icon: 42
-  screen:
-    text:
-      textString: "Willkommen"
+  message: "Willkommen"
 ```
 
 Start your playlist with the names you saved:

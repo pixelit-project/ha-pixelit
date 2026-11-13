@@ -5,6 +5,7 @@ from __future__ import annotations
 from homeassistant.components.light import ATTR_BRIGHTNESS, ColorMode, LightEntity
 from homeassistant.exceptions import ServiceValidationError
 
+from .content import build_screen
 from .entity import device_info
 
 PARALLEL_UPDATES = 0
@@ -71,16 +72,16 @@ class PixelItLight(LightEntity):
         icon_animation_delay: int = 100,
     ) -> None:
         """Wake separately: firmware ignores content alongside sleepMode."""
-        text = {
-            "textString": message,
-            "hexColor": color,
-            "scrollText": {"auto": "auto", "always": True, "off": False}[scroll],
-            "bigFont": int(large_font),
-            "centerText": center,
-            **({"position": {"x": 0, "y": 1}} if icon is None else {}),
-        }
+        screen = build_screen(
+            message=message,
+            color=color,
+            scroll=scroll,
+            large_font=large_font,
+            center=center,
+            icon=icon,
+        )
         await self._coordinator.player.async_show_message(
-            self._with_icon({"text": text}, icon, icon_animation_delay),
+            self._with_icon(screen, icon, icon_animation_delay),
             protection_duration,
         )
 
@@ -99,11 +100,27 @@ class PixelItLight(LightEntity):
     async def async_set_screen(
         self,
         name: str,
-        screen: dict,
-        duration: float,
+        screen: dict | None = None,
+        duration: float = 5,
         icon: int | None = None,
         icon_animation_delay: int = 100,
+        message: str | None = None,
+        clock: bool = False,
+        color: str = "#FFFFFF",
+        scroll: str = "auto",
+        large_font: bool = False,
+        center: bool = True,
     ) -> None:
+        screen = build_screen(
+            screen=screen,
+            message=message,
+            clock=clock,
+            color=color,
+            scroll=scroll,
+            large_font=large_font,
+            center=center,
+            icon=icon,
+        )
         await self._coordinator.player.async_set_screen(
             name, self._with_icon(screen, icon, icon_animation_delay), duration
         )
@@ -119,11 +136,27 @@ class PixelItLight(LightEntity):
 
     async def async_show_alert(
         self,
-        screen: dict,
-        duration: float,
+        screen: dict | None = None,
+        duration: float = 10,
         icon: int | None = None,
         icon_animation_delay: int = 100,
+        message: str | None = None,
+        clock: bool = False,
+        color: str = "#FFFFFF",
+        scroll: str = "auto",
+        large_font: bool = False,
+        center: bool = True,
     ) -> None:
+        screen = build_screen(
+            screen=screen,
+            message=message,
+            clock=clock,
+            color=color,
+            scroll=scroll,
+            large_font=large_font,
+            center=center,
+            icon=icon,
+        )
         await self._coordinator.player.async_show_alert(
             self._with_icon(screen, icon, icon_animation_delay), duration
         )

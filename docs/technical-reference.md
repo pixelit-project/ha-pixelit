@@ -159,3 +159,18 @@ width/height fallbacks remain supported. Theme styling is the default; set
 `transparent: true` for the previous frameless appearance. Status is independent
 of the title. Sections use automatic content height; masonry uses measured height
 with an aspect-ratio estimate before layout. Pixel gaps shrink on narrow cards.
+
+## User-friendly action content
+
+`set_screen` and `show_alert` accept the same simple text options as
+`show_message`: `message`, `color` (#RRGGBB, default white), `scroll`,
+`large_font`, `center`, and optional `icon`. They can also use `clock: true`
+instead of a message. Advanced `screen` payloads remain supported; the screen,
+message and clock choices are mutually exclusive. Icon-only content is allowed.
+Explicit advanced payloads retain their own text styling and positioning.
+
+Action forms use native text inputs and a text selector with `type: color` for
+color picking, preserving the existing hexadecimal `color` field. Text appearance
+and advanced payloads live in collapsed sections. Sections do not change the
+flat action data structure. The playlist selector now edits a list of names via
+`text.multiple`; the existing `screens: [clock, weather]` format stays valid.

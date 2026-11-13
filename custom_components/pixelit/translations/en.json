@@ -44,11 +44,11 @@
       "fields": {
         "message": {
           "name": "Message",
-          "description": "Text to display (1–255 characters)."
+          "description": "Enter your text. An optional Gallery icon appears beside it."
         },
         "color": {
           "name": "Text color",
-          "description": "Text color as #RRGGBB."
+          "description": "Choose a color. Defaults to white. For a clock, sets the clock color."
         },
         "scroll": {
           "name": "Scrolling",
@@ -74,19 +74,27 @@
           "name": "Animation speed",
           "description": "Milliseconds between frames. Has no effect on static icons."
         }
+      },
+      "sections": {
+        "text_options": {
+          "name": "Text appearance"
+        },
+        "advanced_options": {
+          "name": "Advanced"
+        }
       }
     },
     "set_screen": {
-      "name": "Store screen",
+      "name": "Save display",
       "description": "Store or update a named screen. A playing screen changes on its next turn.",
       "fields": {
         "name": {
           "name": "Name",
-          "description": "Unique screen name (1–64 characters)."
+          "description": "Name for this display, for example weather or clock. Use this name in your playlist."
         },
         "screen": {
-          "name": "Content",
-          "description": "PixelIt screen object containing text, clock, bitmap or animation."
+          "name": "Custom screen (YAML)",
+          "description": "Only for complex displays. Use instead of message or clock. Existing screen objects remain supported."
         },
         "duration": {
           "name": "Display duration",
@@ -99,16 +107,48 @@
         "icon_animation_delay": {
           "name": "Animation speed",
           "description": "Milliseconds between frames. Has no effect on static icons."
+        },
+        "message": {
+          "name": "Message",
+          "description": "Enter your text. An optional Gallery icon appears beside it."
+        },
+        "color": {
+          "name": "Text color",
+          "description": "Choose a color. Defaults to white. For a clock, sets the clock color."
+        },
+        "clock": {
+          "name": "Show clock",
+          "description": "Use the clock instead of a message. Leave the message field empty."
+        },
+        "scroll": {
+          "name": "Scrolling",
+          "description": "Scroll automatically, always, or never."
+        },
+        "center": {
+          "name": "Center text",
+          "description": "Center text horizontally."
+        },
+        "large_font": {
+          "name": "Large font",
+          "description": "Use the large font instead of the small font."
+        }
+      },
+      "sections": {
+        "text_options": {
+          "name": "Text appearance"
+        },
+        "advanced_options": {
+          "name": "Advanced"
         }
       }
     },
     "show_screen": {
-      "name": "Show screen",
+      "name": "Show saved display",
       "description": "Show a stored screen persistently and stop the playlist.",
       "fields": {
         "name": {
           "name": "Name",
-          "description": "Name of a stored screen."
+          "description": "Enter the name of a display you saved previously."
         }
       }
     },
@@ -118,7 +158,7 @@
       "fields": {
         "screens": {
           "name": "Screens",
-          "description": "Ordered list of stored screen names. An empty list stops rotation."
+          "description": "Add saved display names individually in the desired order. No YAML list needed. An empty list stops playback."
         }
       }
     },
@@ -127,12 +167,12 @@
       "description": "Stop rotation and any active alert timer, leaving current content visible."
     },
     "show_alert": {
-      "name": "Show alert",
+      "name": "Show notification",
       "description": "Temporarily interrupt playback, then show the next playlist screen, last managed content or clock. A new alert replaces the previous alert.",
       "fields": {
         "screen": {
-          "name": "Content",
-          "description": "PixelIt alert screen object, for example text.textString and text.hexColor."
+          "name": "Custom screen (YAML)",
+          "description": "Only for complex displays. Use instead of message or clock. Existing screen objects remain supported."
         },
         "duration": {
           "name": "Display duration",
@@ -145,7 +185,48 @@
         "icon_animation_delay": {
           "name": "Animation speed",
           "description": "Milliseconds between frames. Has no effect on static icons."
+        },
+        "message": {
+          "name": "Message",
+          "description": "Enter your text. An optional Gallery icon appears beside it."
+        },
+        "color": {
+          "name": "Text color",
+          "description": "Choose a color. Defaults to white. For a clock, sets the clock color."
+        },
+        "clock": {
+          "name": "Show clock",
+          "description": "Use the clock instead of a message. Leave the message field empty."
+        },
+        "scroll": {
+          "name": "Scrolling",
+          "description": "Scroll automatically, always, or never."
+        },
+        "center": {
+          "name": "Center text",
+          "description": "Center text horizontally."
+        },
+        "large_font": {
+          "name": "Large font",
+          "description": "Use the large font instead of the small font."
         }
+      },
+      "sections": {
+        "text_options": {
+          "name": "Text appearance"
+        },
+        "advanced_options": {
+          "name": "Advanced"
+        }
+      }
+    }
+  },
+  "selector": {
+    "scroll": {
+      "options": {
+        "auto": "Automatic",
+        "always": "Always",
+        "off": "Off"
       }
     }
   }

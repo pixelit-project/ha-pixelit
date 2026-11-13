@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Add simple text, color and clock controls for saved displays and alerts, with collapsible advanced options and an easy playlist list editor.
+
 ## 2.0.0 — 2026-11-13
 - Use native HA card editor fields, theme styling, optional transparency and responsive sizing; keep status visible independently of the title.
 - Use the fixed WebSocket port automatically instead of asking during setup.
