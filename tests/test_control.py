@@ -256,6 +256,42 @@ class ControlTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.ws.sent[-1]["setScreen"], screen)
         await self.client.player.async_stop()
 
+    async def test_gallery_animation_options_reach_device_for_all_actions(self):
+        from test_bitmaps import Session, bitmaps
+
+        session = Session()
+        session.raw = json.dumps(
+            {"id": 42, "rgB565Array": ",".join([json.dumps([0] * 64)] * 2)}
+        ).encode()
+        self.client.player.set_bitmap_library(bitmaps.BitmapLibrary(session))
+        for action in ("show_message", "show_alert", "set_screen"):
+            with self.subTest(action=action):
+                data = {
+                    "message": "Hello",
+                    "icon": 42,
+                    "icon_rubberbanding": True,
+                    "icon_limit_loops": 3,
+                }
+                if action == "set_screen":
+                    data["name"] = "animated"
+                schema = vol.Schema(services.ACTION_SCHEMAS[action])
+                await getattr(self.light, "async_" + action)(**schema(data))
+                if action == "set_screen":
+                    await self.light.async_show_screen("animated")
+                animation = self.ws.sent[-1]["setScreen"]["bitmapAnimation"]
+                self.assertIs(animation["rubberbanding"], True)
+                self.assertEqual(animation["limitLoops"], 3)
+                await self.client.player.async_stop()
+                for field, value in (
+                    ("icon_rubberbanding", "true"),
+                    ("icon_limit_loops", True),
+                    ("icon_limit_loops", -1),
+                    ("icon_limit_loops", 1.5),
+                    ("icon_limit_loops", 2**31),
+                ):
+                    with self.assertRaises(vol.Invalid):
+                        schema({**data, field: value})
+
     async def test_ambiguous_or_empty_content_does_not_send(self):
         for action in ("show_alert", "set_screen"):
             schema = vol.Schema(services.ACTION_SCHEMAS[action])

@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- Add back-and-forth animation and loop limits to Gallery icon actions, with validation for advanced animation payloads.
+
 ## 2.0.1 — 2026-11-13
 - Refresh README screenshots from Home Assistant, setup instructions, stable firmware compatibility, card examples and troubleshooting.
 - Fix Hassfest translation validation by using lowercase transition selector keys while preserving firmware names and existing action calls.
