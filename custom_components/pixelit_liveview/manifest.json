@@ -1,20 +1,20 @@
 {
   "domain": "pixelit_liveview",
   "name": "PixelIt Liveview",
-  "version": "1.2.0",
-  "requirements": [],
-  "dependencies": [
-    "http"
+  "after_dependencies": [
+    "lovelace"
   ],
   "codeowners": [
     "@pixelit-project"
   ],
   "config_flow": true,
-  "iot_class": "local_push",
-  "documentation": "https://github.com/pixelit-project/ha-pixelit",
-  "issue_tracker": "https://github.com/pixelit-project/ha-pixelit/issues",
-  "after_dependencies": [
-    "lovelace"
+  "dependencies": [
+    "http"
   ],
-  "integration_type": "device"
+  "documentation": "https://github.com/pixelit-project/ha-pixelit",
+  "integration_type": "device",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/pixelit-project/ha-pixelit/issues",
+  "requirements": [],
+  "version": "1.2.0"
 }
