@@ -21,9 +21,9 @@ from .transitions import validate_firmware_transition
 
 _LOGGER = logging.getLogger(__name__)
 
-# If we previously received liveview data on the current connection but then
-# nothing arrives within this window, treat the connection as stale and reconnect.
-RECEIVE_TIMEOUT = 15.0
+# Static/sleeping displays may send no frames. Check transport health instead.
+HEARTBEAT_INTERVAL = 15.0
+CONNECT_TIMEOUT = 15.0
 COMMAND_TIMEOUT = 5.0
 HEX_FRAME = re.compile(r"[0-9a-fA-F]+")
 
@@ -53,7 +53,6 @@ class PixelItCoordinator:
         self._data_listeners: set[Callable[[], None]] = set()
         self._control_listeners: set[Callable[[], None]] = set()
         self._hex = ""
-        self._had_data = False
         self.player = ScreenPlayer(
             self.async_send_screens,
             lambda: self.connected and self.info.get("sleepMode") is False,
@@ -194,27 +193,19 @@ class PixelItCoordinator:
 
     async def _run_connection(self) -> None:
         """Run a single WebSocket connection until it is stale, closed, or errors."""
-        async with self._session.ws_connect(self.ws_url) as ws:
+        async with asyncio.timeout(CONNECT_TIMEOUT):
+            ws = await self._session.ws_connect(
+                self.ws_url, heartbeat=HEARTBEAT_INTERVAL
+            )
+        async with ws:
             self._ws = ws
             self._clear_device_data()
             self._connected = True
             self._publish_controls()
-            self._had_data = False
             self._publish()
             _LOGGER.debug("Connected to %s", self.ws_url)
             while True:
-                try:
-                    msg = await asyncio.wait_for(ws.receive(), timeout=RECEIVE_TIMEOUT)
-                except asyncio.TimeoutError:
-                    if self._had_data:
-                        _LOGGER.debug(
-                            "PixelIt sent no frames for %.0fs, reconnecting",
-                            RECEIVE_TIMEOUT,
-                        )
-                        raise
-                    # No data has ever arrived on this connection — PixelIt may
-                    # legitimately be idle. Keep waiting instead of hammering it.
-                    continue
+                msg = await ws.receive()
                 if msg.type == aiohttp.WSMsgType.TEXT:
                     self._handle_message(msg.data)
                 elif msg.type in (
@@ -266,7 +257,6 @@ class PixelItCoordinator:
         if not HEX_FRAME.fullmatch(frame):
             return
 
-        self._had_data = True
         if frame != self._hex:
             self._hex = frame
             self._publish()

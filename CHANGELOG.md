@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Fix reconnect handling for static and sleeping displays using WebSocket heartbeats and bounded connection attempts.
 - Add back-and-forth animation and loop limits to Gallery icon actions, with validation for advanced animation payloads.
 
 ## 2.0.1 — 2026-11-13

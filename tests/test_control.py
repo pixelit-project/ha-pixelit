@@ -8,6 +8,7 @@ from pathlib import Path
 from types import ModuleType, SimpleNamespace
 from unittest.mock import patch
 
+import aiohttp  # Keep transport modules loaded outside the temporary HA stubs.
 import voluptuous as vol
 
 ROOT = Path(__file__).resolve().parents[1]
