@@ -5,7 +5,11 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
-from homeassistant.components.update import UpdateDeviceClass, UpdateEntity
+from homeassistant.components.update import (
+    UpdateDeviceClass,
+    UpdateEntity,
+    UpdateEntityFeature,
+)
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -37,7 +41,7 @@ class PixelItFirmwareUpdate(UpdateEntity):
     _attr_entity_registry_enabled_default = True
     _attr_translation_key = "firmware"
     _attr_title = "PixelIt firmware"
-    _attr_supported_features = 0
+    _attr_supported_features = UpdateEntityFeature(0)
     _attr_release_url = "https://github.com/pixelit-project/PixelIt/releases"
 
     def __init__(self, entry: PixelItConfigEntry) -> None:

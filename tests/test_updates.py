@@ -2,15 +2,35 @@
 
 import json
 import unittest
+from enum import IntFlag
 from types import SimpleNamespace
 from unittest.mock import patch
 
 from test_control import Entity, coordinator, module, pkg, stubs
 
+
+class UpdateEntityFeature(IntFlag):
+    """Model HA's typed feature membership checks instead of integer equality."""
+
+    INSTALL = 1
+    PROGRESS = 4
+
+
+class UpdateEntity(Entity):
+    @property
+    def supported_features(self):
+        return self._attr_supported_features
+
+    @property
+    def state_attributes(self):
+        # HA 2026.11 performs this membership check while writing entity state.
+        return {'in_progress': False if UpdateEntityFeature.PROGRESS in self.supported_features else None}
+
+
 update_stubs = dict(stubs)
 update_stubs['pixelit_test'] = pkg
 update_stubs['homeassistant.components.update'] = module(
-    'update', UpdateEntity=Entity,
+    'update', UpdateEntity=UpdateEntity, UpdateEntityFeature=UpdateEntityFeature,
     UpdateDeviceClass=SimpleNamespace(FIRMWARE='firmware'),
 )
 update_stubs['homeassistant.const'] = module(
@@ -86,3 +106,15 @@ class UpdateTests(unittest.IsolatedAsyncioTestCase):
         count = len(calls)
         self.send(pixelitVersion='3.1.0', latestReleaseVersion='3.2.0')
         self.assertEqual(len(calls), count)
+
+    async def test_state_write_accepts_feature_membership(self):
+        self.assertIsInstance(self.entity.supported_features, UpdateEntityFeature)
+        self.assertNotIn(UpdateEntityFeature.INSTALL, self.entity.supported_features)
+        self.entity.async_on_remove = lambda callback: self.addCleanup(callback)
+        writes = []
+        self.entity.async_write_ha_state = lambda: writes.append(self.entity.state_attributes)
+        await self.entity.async_added_to_hass()
+        self.send(pixelitVersion='3.0.0', latestReleaseVersion='3.1.0')
+        self.assertEqual(writes, [{'in_progress': None}])
+        self.client._handle_message(json.dumps({'liveview': 'FF0000'}))
+        self.assertEqual(self.client.attributes['hex'], 'FF0000')

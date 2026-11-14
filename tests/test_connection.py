@@ -11,6 +11,21 @@ from test_control import coordinator
 
 
 class ConnectionTests(unittest.IsolatedAsyncioTestCase):
+    async def test_stop_after_receiver_failure_allows_cleanup(self):
+        client = coordinator.PixelItCoordinator(None, 'localhost', 81, 32, 8)
+
+        async def failed_receiver():
+            raise TypeError('entity state write failed')
+
+        client._task = asyncio.create_task(failed_receiver())
+        await asyncio.sleep(0)
+        with self.assertLogs(coordinator._LOGGER, level='ERROR') as logs:
+            await client.async_stop()
+        self.assertIn('entity state write failed', '\n'.join(logs.output))
+        self.assertIsNone(client._task)
+        self.assertTrue(client.player._closed)
+        await client.async_stop()
+
     async def run_server(self, handler):
         app = web.Application()
         app.router.add_get('/', handler)

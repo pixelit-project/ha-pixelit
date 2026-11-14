@@ -92,9 +92,16 @@ class PixelItCoordinator:
         await self.player.async_stop()
         if self._task is not None:
             self._task.cancel()
-            with suppress(asyncio.CancelledError):
-                await self._task
-            self._task = None
+            try:
+                with suppress(asyncio.CancelledError):
+                    await self._task
+            except Exception:
+                # A previous receiver failure must not prevent entry reload.
+                _LOGGER.exception(
+                    "PixelIt WebSocket task for %s failed before shutdown", self._host
+                )
+            finally:
+                self._task = None
 
     def clear_listener(self) -> None:
         """Detach the sensor callback."""
