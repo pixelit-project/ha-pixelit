@@ -238,3 +238,32 @@ HA transition selector values use snake_case, for example `vertical_slide` and
 `bitmap_wipe`. They map to firmware `verticalSlide` and `bitmapWipe` internally.
 Legacy CamelCase action values remain accepted; advanced firmware payloads and
 stored screens retain their original wire names.
+
+
+## Native controls and physical buttons
+
+Automatic brightness uses `setScreen` with `autobrightness` over the existing
+serialized WebSocket command channel. Its state comes from
+`sysinfo.matrixBrightnessAutomatic`; a successful acknowledgement alone does not
+change the entity state.
+
+Clock controls send a single whitelisted setting (`clockAutoFallbackActive` or
+`clockAutoFallbackTime`, 1–86400 integer seconds) to HTTP `POST /api/config` on
+port 80. Firmware 3.0.1 saves configuration and restarts after responding with
+`{"response":"OK"}`. The WebSocket configuration command also restarts and has
+no acknowledgement, so it is unsuitable for acknowledged control here. HTTP
+requests share the device command lock, have a five-second deadline and a
+1024-byte response limit, and are never automatically retried. Clock
+configuration writes restart the device even when reapplying a value. States remain device-reported;
+normal disconnect/reconnect handling pauses and resumes managed playback.
+
+Button discovery uses `config.btn0Enabled` through `btn2Enabled`. WebSocket
+`buttons.leftButton`, `middleButton`, and `rightButton` accept JSON booleans and
+the firmware snapshot strings `"true"` and `"false"`. Only changes after a known
+initial state produce `press`/`release` events. Reconnect clears baselines and
+hardware availability; disabled buttons are unavailable. All entity discovery
+and event listeners are removed on unload. There is no button polling, gesture
+timer, or retained/replayed event. Firmware 3.0.1 sends resolved single/double/long
+press gestures only through MQTT; adding native gestures requires a bounded,
+non-retained WebSocket firmware event channel. No firmware changes or increased
+animation/network limits are introduced by these platforms.

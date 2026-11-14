@@ -112,6 +112,65 @@
       "firmware": {
         "name": "Firmware"
       }
+    },
+    "switch": {
+      "automatic_brightness": {
+        "name": "Automatic brightness"
+      },
+      "automatic_clock": {
+        "name": "Automatic clock"
+      }
+    },
+    "number": {
+      "clock_fallback_delay": {
+        "name": "Clock fallback delay"
+      }
+    },
+    "binary_sensor": {
+      "left_button": {
+        "name": "Left button"
+      },
+      "middle_button": {
+        "name": "Middle button"
+      },
+      "right_button": {
+        "name": "Right button"
+      }
+    },
+    "event": {
+      "left_button_event": {
+        "name": "Left button event",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "press": "Pressed",
+              "release": "Released"
+            }
+          }
+        }
+      },
+      "middle_button_event": {
+        "name": "Middle button event",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "press": "Pressed",
+              "release": "Released"
+            }
+          }
+        }
+      },
+      "right_button_event": {
+        "name": "Right button event",
+        "state_attributes": {
+          "event_type": {
+            "state": {
+              "press": "Pressed",
+              "release": "Released"
+            }
+          }
+        }
+      }
     }
   },
   "services": {

@@ -155,6 +155,27 @@ The **Display** entity lets you switch PixelIt on or off and adjust brightness.
 No MQTT setup is needed. You can use the actions below in HA automations and
 scripts. Replace `light.your_pixelit_display` with your Display entity.
 
+### Automatic brightness, clock and buttons
+
+The **Automatic brightness** switch enables or disables the device's ambient-light
+brightness control. The **Automatic clock** switch controls the firmware clock
+fallback; **Clock fallback delay** sets its delay from 1 to 86400 seconds.
+These controls show device feedback, rather than assuming a command succeeded.
+Clock changes also require HTTP access from Home Assistant to the display on port 80.
+
+**Changing automatic clock settings restarts the display on current firmware.**
+The integration reconnects and resumes its managed playback. The automatic clock
+and its delay are saved on the device; the brightness switch changes its runtime
+setting. Firmware clock fallback can replace displayed content independently of
+Home Assistant playlists.
+
+Each button enabled in the device settings gets a pressed/released binary sensor
+and an event entity with `press` and `release` events for automations. Initial
+connection and reconnect snapshots do not generate button events. Disabled buttons
+are unavailable. The integration requires no MQTT and does not poll buttons.
+Single-, double- and long-press gesture events are currently available only through
+firmware MQTT; native gesture delivery needs a firmware extension.
+
 ### Use the action forms
 
 In **Developer tools → Actions**, or in an automation, select a PixelIt action and

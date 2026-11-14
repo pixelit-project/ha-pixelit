@@ -26,6 +26,7 @@ HEARTBEAT_INTERVAL = 15.0
 CONNECT_TIMEOUT = 15.0
 COMMAND_TIMEOUT = 5.0
 HEX_FRAME = re.compile(r"[0-9a-fA-F]+")
+BUTTON_KEYS = ("leftButton", "middleButton", "rightButton")
 
 
 class PixelItCoordinator:
@@ -49,6 +50,9 @@ class PixelItCoordinator:
         self._response = None
         self.info: dict = {}
         self.sensor_data: dict = {}
+        self.buttons: dict[str, bool] = {}
+        self.enabled_buttons: set[str] = set()
+        self._button_listeners: set[Callable[[str, str], None]] = set()
         self.temperature_unit: int | None = None
         self._data_listeners: set[Callable[[], None]] = set()
         self._control_listeners: set[Callable[[], None]] = set()
@@ -123,8 +127,52 @@ class PixelItCoordinator:
     def _clear_device_data(self) -> None:
         self.info = {}
         self.sensor_data = {}
+        self.buttons = {}
+        self.enabled_buttons = set()
         self.temperature_unit = None
         self._publish_data()
+
+    def add_button_listener(self, listener) -> Callable[[], None]:
+        """Subscribe to real button transitions, never initial snapshots."""
+        self._button_listeners.add(listener)
+        return lambda: self._button_listeners.discard(listener)
+
+    async def async_set_clock_config(self, field: str, value: bool | int) -> None:
+        """Persist a clock setting; stable firmware restarts after this API call."""
+        if not (
+            field == "clockAutoFallbackActive"
+            and type(value) is bool
+            or field == "clockAutoFallbackTime"
+            and type(value) is int
+            and 1 <= value <= 86400
+        ):
+            raise HomeAssistantError("Invalid PixelIt clock setting")
+        async with self._command_lock:
+            if self._stopping or not self.connected:
+                raise HomeAssistantError("PixelIt is disconnected")
+            url = URL.build(scheme="http", host=self._host, path="/api/config")
+            try:
+                async with asyncio.timeout(COMMAND_TIMEOUT):
+                    async with self._session.post(url, json={field: value}) as response:
+                        response.raise_for_status()
+                        raw = b""
+                        while len(raw) <= 1024:
+                            chunk = await response.content.read(1025 - len(raw))
+                            if not chunk:
+                                break
+                            raw += chunk
+                        if len(raw) > 1024 or json.loads(raw).get("response") != "OK":
+                            raise HomeAssistantError("PixelIt rejected clock setting")
+            except (
+                aiohttp.ClientError,
+                OSError,
+                TimeoutError,
+                ValueError,
+                AttributeError,
+            ) as err:
+                raise HomeAssistantError(
+                    "PixelIt clock setting failed or timed out"
+                ) from err
 
     def add_control_listener(self, listener: Callable[[], None]) -> Callable[[], None]:
         """Subscribe to state changes without publishing every pixel frame."""
@@ -233,6 +281,38 @@ class PixelItCoordinator:
         if isinstance(obj.get("sysinfo"), dict):
             self.info = obj["sysinfo"]
             self._publish_controls()
+            self._publish_data()
+        if isinstance(obj.get("config"), dict):
+            config = obj["config"]
+            for index, key in enumerate(BUTTON_KEYS):
+                field = f"btn{index}Enabled"
+                if field not in config:
+                    continue
+                if config[field] is True:
+                    self.enabled_buttons.add(key)
+                else:
+                    self.enabled_buttons.discard(key)
+                    self.buttons.pop(key, None)
+            self._publish_data()
+        if isinstance(obj.get("buttons"), dict):
+            for key in BUTTON_KEYS:
+                value = obj["buttons"].get(key)
+                if type(value) is bool:
+                    pressed = value
+                elif value in ("true", "false"):
+                    pressed = value == "true"
+                else:
+                    continue
+                previous = self.buttons.get(key)
+                self.buttons[key] = pressed
+                if (
+                    not self._stopping
+                    and previous is not None
+                    and previous != pressed
+                    and key in self.enabled_buttons
+                ):
+                    for listener in tuple(self._button_listeners):
+                        listener(key, "press" if pressed else "release")
             self._publish_data()
         if isinstance(obj.get("sensor"), dict):
             readings = {
