@@ -107,6 +107,11 @@
       "animation_frames": {
         "name": "Animation frames"
       }
+    },
+    "update": {
+      "firmware": {
+        "name": "Firmware"
+      }
     }
   },
   "services": {

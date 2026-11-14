@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- Report available firmware updates through an enabled native HA update entity without MQTT Discovery.
 - Fix reconnect handling for static and sleeping displays using WebSocket heartbeats and bounded connection attempts.
 - Add back-and-forth animation and loop limits to Gallery icon actions, with validation for advanced animation payloads.
 

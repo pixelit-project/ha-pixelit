@@ -23,7 +23,7 @@ from .frontend import ensure_frontend
 from .services import async_setup_services
 
 type PixelItConfigEntry = ConfigEntry[PixelItCoordinator]
-PLATFORMS = (Platform.SENSOR, Platform.LIGHT)
+PLATFORMS = (Platform.SENSOR, Platform.LIGHT, Platform.UPDATE)
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 

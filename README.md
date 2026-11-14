@@ -138,7 +138,16 @@ versions and memory information are also available as diagnostic entities.
 These are disabled initially to keep your device page and history focused.
 Open your PixelIt device and enable the diagnostic entities you need.
 Hardware-specific memory values appear only on devices that provide them.
-If MQTT Discovery is also active, its sensors remain separate entities.
+A separate **Firmware** update entity is enabled by default and shows available
+firmware updates directly in Home Assistant, without MQTT Discovery. It uses the
+release information reported by the display, including its prerelease setting;
+there are no additional release checks or device requests. Until the device has
+completed its check, the update status may be unknown. Install firmware using the
+existing WebUI or Webflasher workflow; this entity only reports availability.
+You can use its update state in automations for your own notifications.
+
+If MQTT Discovery is also active, its entities remain separate entities. This
+addition replaces MQTT firmware update reporting, not every MQTT control.
 
 ## Controlling your display
 
