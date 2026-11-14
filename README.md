@@ -10,6 +10,8 @@ remote Home Assistant access, including Nabu Casa.
 
 Maintained by the [PixelIt project](https://github.com/pixelit-project).
 
+Maintainers can [publish stable, beta and RC releases using version tags](docs/releases.md).
+
 ## Features
 
 - **Display control** — Switch the matrix on or off and adjust brightness.
