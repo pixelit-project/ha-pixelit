@@ -1,7 +1,7 @@
 # Changelog
 
 ## Unreleased
-- (o0shojo0o) Publish validated GitHub releases from version tags with changelog notes, preserving Unreleased for beta and RC prereleases and providing a stable release preparation command.
+- (o0shojo0o) Automatically prepare manifest versions and changelog notes from release tags, preserving Unreleased for beta and RC prereleases and finalizing it for stable releases.
 - (o0shojo0o) Add automatic brightness and clock switches, clock delay (clock changes restart the display), and physical button states and press/release events without MQTT.
 - (o0shojo0o) Report available firmware updates through an enabled native HA update entity without MQTT Discovery.
 - (o0shojo0o) Fix reconnect handling for static and sleeping displays using WebSocket heartbeats and bounded connection attempts.
