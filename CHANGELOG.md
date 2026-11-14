@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+
+## 2.1.1 — 2026-11-14
 - (o0shojo0o) Fix all displays disconnecting on Home Assistant 2026.11 when firmware update entity state is written, and allow reload after a failed WebSocket task.
 
 ## 2.1.0 — 2026-11-14
