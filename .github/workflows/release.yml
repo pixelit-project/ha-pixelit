@@ -1,0 +1,69 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]*'
+      - '[0-9]*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  version:
+    name: Validate release version
+    runs-on: ubuntu-latest
+    outputs:
+      prerelease: ${{ steps.version.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Check tag and manifest
+        id: version
+        run: python scripts/release_version.py
+      - name: Validate changelog release notes
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: python scripts/release_changelog.py notes "$RELEASE_TAG" --output "$RUNNER_TEMP/release-notes.md"
+
+  validate:
+    needs: version
+    uses: ./.github/workflows/validate.yml
+
+  release:
+    name: Publish GitHub release
+    needs: [version, validate]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+      - name: Extract changelog release notes
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: python scripts/release_changelog.py notes "$RELEASE_TAG" --output "$RUNNER_TEMP/release-notes.md"
+      - name: Create release from changelog
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          PRERELEASE: ${{ needs.version.outputs.prerelease }}
+        shell: bash
+        run: |
+          args=(--verify-tag --notes-file "$RUNNER_TEMP/release-notes.md" --title "$RELEASE_TAG")
+          if [[ "$PRERELEASE" == "true" ]]; then
+            args+=(--prerelease --latest=false)
+          fi
+          gh release create "$RELEASE_TAG" "${args[@]}"

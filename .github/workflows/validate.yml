@@ -6,6 +6,7 @@ on:
   schedule:
     - cron: "17 4 * * *"
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
@@ -53,7 +54,7 @@ jobs:
       - name: Run host tests
         run: python -m unittest discover -s tests -v
       - name: Check Python syntax
-        run: python -m compileall -q custom_components tests
+        run: python -m compileall -q custom_components scripts tests
       - name: Test card behavior
         run: node --test tests/frontend/card.test.cjs
       - name: Check card syntax
