@@ -85,6 +85,9 @@ cards. Enable **Transparent background** to use the earlier frameless appearance
 | `show_status` | bool | true | Show connection status badge |
 | `show_pixels` | bool | true | Show the pixel grid |
 | `transparent` | bool | false | Hide the card background and border |
+| `light_entity` | string | Empty | PixelIt Display light to control; select separately from the Liveview sensor |
+| `show_power` | bool | false | Show an optional power button |
+| `show_brightness` | bool | false | Show an optional brightness slider |
 | `tap_action` | object | `action: more-info` | Optional action when tapping the card |
 | `hold_action` | object | `action: none` | Optional action when holding the card |
 | `double_tap_action` | object | `action: none` | Optional action when double-tapping the card |
@@ -127,7 +130,22 @@ title: PixelIt
 show_status: true
 ```
 
-Use a separate standard Home Assistant light card for power and brightness;
+Under **Display controls**, select the matching PixelIt **Display** light entity
+and optionally enable the power button, brightness slider, or both. They are hidden
+by default and do not trigger the Liveview tap/hold/double-tap actions. Controls
+follow HA entity feedback and are disabled when the light is unavailable or a
+command is pending. The brightness slider sends one command when released and
+turns the display on. Automatic brightness may subsequently adjust brightness.
+
+```yaml
+type: custom:pixelit-card
+entity: sensor.your_pixelit_liveview
+light_entity: light.your_pixelit_display
+show_power: true
+show_brightness: true
+```
+
+Alternatively, use a separate standard Home Assistant light card for power and brightness;
 the PixelIt card mirrors the display.
 
 ## Upgrading from PixelIt Liveview

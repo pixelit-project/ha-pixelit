@@ -15,22 +15,23 @@ function liveviewEntities(hass){
 
 // ===== i18n =====
 const I18N={
-  de:{actions:"Aktionen",tap_action:"Tippen",hold_action:"Gedrückt halten",double_tap_action:"Doppeltippen",title:"Titel",entity:"PixelIt-Sensor",width:"Matrix-Breite (Pixel)",height:"Matrix-Höhe (Pixel)",gap:"Abstand zwischen Pixeln (px)",show_header:"Titel anzeigen",transparent:"Transparenter Hintergrund",advanced:"Erweitert",show_status:"Verbindungsstatus anzeigen",show_pixels:"Pixel anzeigen",general:"Allgemein",display:"Anzeige",connected:"Verbunden",disconnected:"Getrennt",no_data:"Warte auf Bilddaten",no_entity:"Kein PixelIt-Sensor ausgewählt",missing_entity:"PixelIt-Sensor nicht verfügbar",card_title:"PixelIt",pixelit_settings:"PixelIt-Einstellungen",display_options:"Anzeige-Optionen"},
-  en:{actions:"Actions",tap_action:"Tap",hold_action:"Hold",double_tap_action:"Double tap",title:"Title",entity:"PixelIt sensor",width:"Matrix width (pixels)",height:"Matrix height (pixels)",gap:"Gap between pixels (px)",show_header:"Show title",transparent:"Transparent background",advanced:"Advanced",show_status:"Show connection status",show_pixels:"Show pixels",general:"General",display:"Display",connected:"Connected",disconnected:"Disconnected",no_data:"Waiting for a frame",no_entity:"No PixelIt sensor selected",missing_entity:"PixelIt sensor unavailable",card_title:"PixelIt",pixelit_settings:"PixelIt settings",display_options:"Display options"}
+  de:{controls:"Display-Steuerung",light_entity:"Display-Licht",show_power:"Ein/Aus anzeigen",show_brightness:"Helligkeit anzeigen",power:"Display ein/aus",brightness:"Helligkeit",control_unavailable:"Display-Licht nicht verfügbar oder nicht ausgewählt",control_failed:"Display-Steuerung fehlgeschlagen",actions:"Aktionen",tap_action:"Tippen",hold_action:"Gedrückt halten",double_tap_action:"Doppeltippen",title:"Titel",entity:"PixelIt-Sensor",width:"Matrix-Breite (Pixel)",height:"Matrix-Höhe (Pixel)",gap:"Abstand zwischen Pixeln (px)",show_header:"Titel anzeigen",transparent:"Transparenter Hintergrund",advanced:"Erweitert",show_status:"Verbindungsstatus anzeigen",show_pixels:"Pixel anzeigen",general:"Allgemein",display:"Anzeige",connected:"Verbunden",disconnected:"Getrennt",no_data:"Warte auf Bilddaten",no_entity:"Kein PixelIt-Sensor ausgewählt",missing_entity:"PixelIt-Sensor nicht verfügbar",card_title:"PixelIt",pixelit_settings:"PixelIt-Einstellungen",display_options:"Anzeige-Optionen"},
+  en:{controls:"Display controls",light_entity:"Display light",show_power:"Show power control",show_brightness:"Show brightness control",power:"Display power",brightness:"Brightness",control_unavailable:"Display light unavailable or not selected",control_failed:"Display control failed",actions:"Actions",tap_action:"Tap",hold_action:"Hold",double_tap_action:"Double tap",title:"Title",entity:"PixelIt sensor",width:"Matrix width (pixels)",height:"Matrix height (pixels)",gap:"Gap between pixels (px)",show_header:"Show title",transparent:"Transparent background",advanced:"Advanced",show_status:"Show connection status",show_pixels:"Show pixels",general:"General",display:"Display",connected:"Connected",disconnected:"Disconnected",no_data:"Waiting for a frame",no_entity:"No PixelIt sensor selected",missing_entity:"PixelIt sensor unavailable",card_title:"PixelIt",pixelit_settings:"PixelIt settings",display_options:"Display options"}
 };
 function getLang(hass){const lang=(hass.locale?.language||hass.language||"en").split("-")[0];return I18N[lang]?lang:"en";}
 function tr(hass,key){if(!hass)return I18N.en[key]||key;const lang=getLang(hass);return(I18N[lang]&&I18N[lang][key])||I18N.en[key]||key;}
 
 const ACTION_DEFAULTS={tap_action:"more-info",hold_action:"none",double_tap_action:"none"};
-const CARD_DEFAULTS={title:"",entity:"",gap:1,show_header:true,show_status:true,show_pixels:true,transparent:false};
+const CARD_DEFAULTS={title:"",entity:"",gap:1,show_header:true,show_status:true,show_pixels:true,transparent:false,light_entity:"",show_power:false,show_brightness:false};
 function normalizeConfig(config){
   if(!config||typeof config!=="object"||Array.isArray(config))throw new Error("Invalid PixelIt card configuration");
   const provided=Object.fromEntries(Object.entries(config).filter(([,value])=>value!==undefined));
   const result={...CARD_DEFAULTS,...provided,type:config.type||CARD_TYPE};
   if(typeof result.entity!=="string"||(result.entity&&!result.entity.startsWith("sensor.")))throw new Error("PixelIt requires a sensor entity");
+  if(typeof result.light_entity!=="string"||(result.light_entity&&!result.light_entity.startsWith("light.")))throw new Error("Display controls require a light entity");
   if(typeof result.title!=="string")throw new Error("PixelIt title must be text");
   if(!Number.isInteger(result.gap)||result.gap<0||result.gap>16)throw new Error("Pixel gap must be an integer from 0 to 16");
-  for(const key of ["show_header","show_status","show_pixels","transparent"]){
+  for(const key of ["show_header","show_status","show_pixels","transparent","show_power","show_brightness"]){
     if(typeof result[key]!=="boolean")throw new Error(key+" must be true or false");
   }
   for(const key of ["tap_action","hold_action","double_tap_action"]){
@@ -63,6 +64,11 @@ let PLEditor=class extends re{
       {name:"show_status",selector:{boolean:{}}},
       {name:"show_pixels",selector:{boolean:{}}},
       {name:"transparent",selector:{boolean:{}}},
+      {name:"",type:"expandable",title:tr(this.hass,"controls"),flatten:true,schema:[
+        {name:"light_entity",selector:{entity:{filter:[{domain:"light",integration:"pixelit"}]}}},
+        {name:"show_power",selector:{boolean:{}}},
+        {name:"show_brightness",selector:{boolean:{}}}
+      ]},
       {name:"",type:"expandable",title:tr(this.hass,"actions"),flatten:true,schema:[
         ...["tap_action","hold_action","double_tap_action"].map(name=>({name,selector:{ui_action:{default_action:ACTION_DEFAULTS[name]}}}))
       ]},
@@ -84,7 +90,7 @@ PLEditor=e([ce(EDITOR_TAG)],PLEditor);
 
 // ===== Main Card =====
 let PixelItLiveviewCard=class extends re{
-  setConfig(config){this._clearGestures();this._config=normalizeConfig(config);}
+  setConfig(config){this._clearGestures();this._controlError="";this._config=normalizeConfig(config);}
   disconnectedCallback(){this._clearGestures();super.disconnectedCallback();}
   _clearGestures(){
     clearTimeout(this._holdTimer);clearTimeout(this._tapTimer);
@@ -122,13 +128,50 @@ let PixelItLiveviewCard=class extends re{
     event.preventDefault();this._clearGestures();
     this._runAction(event.shiftKey?"hold":"tap");
   }
+  _controlState(){
+    const state=this.hass?.states?.[this._config.light_entity];
+    return state&&["on","off"].includes(state.state)?state:null;
+  }
+  async _control(service,data={}){
+    if(this._controlBusy||!this._controlState())return;
+    const entity=this._config.light_entity;
+    this._controlBusy=true;this._controlError="";
+    try{await this.hass.callService("light",service,{...data,entity_id:entity});}
+    catch(error){this._controlError=tr(this.hass,"control_failed")+": "+(error?.message||String(error));}
+    finally{this._controlBusy=false;}
+  }
+  _togglePower(){return this._control(this._controlState()?.state==="on"?"turn_off":"turn_on");}
+  _brightnessChanged(event){
+    const brightness=Number(event.target.value);
+    if(this._config.show_brightness&&Number.isInteger(brightness)&&brightness>=1&&brightness<=255)return this._control("turn_on",{brightness});
+  }
+  _renderControls(){
+    const cfg=this._config;
+    if(!cfg.show_power&&!cfg.show_brightness)return W;
+    const state=this._controlState();
+    const brightness=state?.attributes?.brightness;
+    const modes=state?.attributes?.supported_color_modes||[];
+    const supportsBrightness=modes.some(mode=>["brightness","color_temp","hs","xy","rgb","rgbw","rgbww","white"].includes(mode));
+    return V`<div class="plc-controls">
+      ${cfg.show_power?V`<button type="button" aria-label=${tr(this.hass,"power")}
+        aria-pressed=${state?.state==="on"?"true":"false"} ?disabled=${!state||this._controlBusy}
+        @click=${this._togglePower}><ha-icon icon="mdi:power"></ha-icon></button>`:W}
+      ${cfg.show_brightness?V`<label class="plc-brightness">${tr(this.hass,"brightness")}
+        <input type="range" min="1" max="255" step="1" .value=${String(Number.isInteger(brightness)?Math.max(1,brightness):1)}
+          aria-label=${tr(this.hass,"brightness")} ?disabled=${!state||!supportsBrightness||this._controlBusy}
+          @change=${this._brightnessChanged}>
+      </label>`:W}
+      ${!state?V`<span class="plc-control-error" role="status">${tr(this.hass,"control_unavailable")}</span>`:W}
+      ${this._controlError?V`<span class="plc-control-error" role="alert">${this._controlError}</span>`:W}
+    </div>`;
+  }
   _contextMenu(event){if(this._hasAction("hold"))event.preventDefault();}
   getCardSize(){
     const measured=this.getBoundingClientRect().height;
     if(measured>0)return Math.max(1,Math.ceil(measured/50));
     const data=this._getData();
     const ratio=(data?.height||this._config?.height||8)/(data?.width||this._config?.width||32);
-    return Math.max(1,Math.ceil((32+(this._config?.show_header||this._config?.show_status?32:0)+(this._config?.show_pixels?336*ratio:0))/50));
+    return Math.max(1,Math.ceil((32+(this._config?.show_power||this._config?.show_brightness?56:0)+(this._config?.show_header||this._config?.show_status?32:0)+(this._config?.show_pixels?336*ratio:0))/50));
   }
   getGridOptions(){return{columns:12,rows:"auto",min_columns:3,min_rows:1};}
   static async getConfigElement(){
@@ -151,6 +194,7 @@ let PixelItLiveviewCard=class extends re{
     if(!previousHass||!this.hass)return true;
     const entity=this._config?.entity;
     return previousHass.states?.[entity]!==this.hass.states?.[entity]
+      ||previousHass.states?.[this._config.light_entity]!==this.hass.states?.[this._config.light_entity]
       ||getLang(previousHass)!==getLang(this.hass);
   }
 
@@ -220,19 +264,26 @@ let PixelItLiveviewCard=class extends re{
         }
       }
     }
-    return V`<ha-card class=${cfg.transparent?"plc transparent":"plc"}
+    return V`<ha-card class=${cfg.transparent?"plc transparent":"plc"}><div class="plc-content"
       tabindex=${this._interactive()?"0":"-1"} role=${this._interactive()?"button":W}
       aria-label=${title} @pointerdown=${this._pointerDown} @pointermove=${this._pointerMove}
       @pointerup=${this._pointerUp} @pointercancel=${this._clearGestures} @pointerleave=${this._clearGestures}
-      @keydown=${this._keyDown} @contextmenu=${this._contextMenu}><div class="plc-inner">${cfg.show_header||(cfg.show_status&&data)?V`<div class="plc-header">${cfg.show_header?V`<span class="plc-title">${title}</span>`:W}${cfg.show_status&&data?V`<span class="plc-status ${statusClass}" role="status">${statusText}</span>`:W}</div>`:W}${cfg.show_pixels&&hasPixels?V`<div class="plc-grid" role="img" aria-label=${title} style="${gridStyle}">${cells}</div>`:W}${message?V`<div class="plc-empty" role="status">${message}</div>`:W}</div></ha-card>`;
+      @keydown=${this._keyDown} @contextmenu=${this._contextMenu}><div class="plc-inner">${cfg.show_header||(cfg.show_status&&data)?V`<div class="plc-header">${cfg.show_header?V`<span class="plc-title">${title}</span>`:W}${cfg.show_status&&data?V`<span class="plc-status ${statusClass}" role="status">${statusText}</span>`:W}</div>`:W}${cfg.show_pixels&&hasPixels?V`<div class="plc-grid" role="img" aria-label=${title} style="${gridStyle}">${cells}</div>`:W}${message?V`<div class="plc-empty" role="status">${message}</div>`:W}</div></div>${this._renderControls()}</ha-card>`;
   }
 };
 PixelItLiveviewCard.styles=a`
 :host{display:block;min-width:0;}
 ha-card{overflow:hidden;}
-ha-card[role="button"]{cursor:pointer;}
-ha-card:focus-visible{outline:2px solid var(--primary-color);outline-offset:2px;}
+.plc-content[role="button"]{cursor:pointer;}
+.plc-content:focus-visible{outline:2px solid var(--primary-color);outline-offset:2px;}
 ha-card.transparent{background:transparent;box-shadow:none;border:none;}
+.plc-controls{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:0 16px 16px;}
+.plc-controls button{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;border:1px solid var(--divider-color);background:var(--secondary-background-color);color:var(--primary-text-color);cursor:pointer;}
+.plc-controls button[aria-pressed="true"]{color:var(--primary-color);}
+.plc-controls button:disabled{opacity:0.5;cursor:default;}
+.plc-brightness{display:flex;align-items:center;flex:1;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--secondary-text-color);}
+.plc-brightness input{min-width:80px;flex:1;accent-color:var(--primary-color);}
+.plc-control-error{flex-basis:100%;font-size:12px;color:var(--error-color);overflow-wrap:anywhere;}
 .plc-inner{display:flex;flex-direction:column;gap:12px;padding:16px;container-type:inline-size;min-width:0;}
 .plc-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;min-width:0;}
 .plc-title{font-size:var(--ha-font-size-l,16px);font-weight:500;color:var(--primary-text-color);overflow-wrap:anywhere;min-width:0;}
@@ -247,6 +298,8 @@ ha-card.transparent{background:transparent;box-shadow:none;border:none;}
 `;
 e([pe({attribute:false})],PixelItLiveviewCard.prototype,"hass",void 0);
 e([ue()],PixelItLiveviewCard.prototype,"_config",void 0);
+e([ue()],PixelItLiveviewCard.prototype,"_controlBusy",void 0);
+e([ue()],PixelItLiveviewCard.prototype,"_controlError",void 0);
 PixelItLiveviewCard=e([ce(CARD_NAME)],PixelItLiveviewCard);
 
 // Keep existing dashboard card types working after the integration rename.

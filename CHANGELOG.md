@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- (o0shojo0o) Add optional card power and brightness controls with a separately selected Display light; both are hidden by default.
+
 - (o0shojo0o) Add optional, independently configurable tap, hold and double-tap card actions in the visual editor and YAML; tap defaults to more information, while hold and double-tap default to no action, matching the HA entity card for sensors.
 
 ## 2.1.1 — 2026-11-14

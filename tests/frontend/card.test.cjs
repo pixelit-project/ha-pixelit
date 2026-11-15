@@ -40,8 +40,8 @@ test('status remains visible with title hidden',()=>{
  assert.doesNotMatch(card({show_header:false,show_status:false}).render(),/plc-status/);
 });
 test('theme card is default and transparency is explicit',()=>{
- assert.match(card().render(),/class=plc\s/);
- assert.match(card({transparent:true}).render(),/class=plc transparent\s/);
+ assert.match(card().render(),/class=plc>/);
+ assert.match(card({transparent:true}).render(),/class=plc transparent>/);
 });
 test('missing frames show a useful message without an empty pixel grid',()=>{
  const instance=card({entity:''});assert.match(instance.render(),/Kein PixelIt-Sensor/);assert.doesNotMatch(instance.render(),/class="plc-grid"/);
@@ -150,4 +150,47 @@ test('disabled actions never dispatch and action settings survive editor changes
  const editor=new Editor();editor.hass=hass;editor.setConfig({tap_action:{action:'url',url_path:'https://example.com'}});
  editor._valueChanged({stopPropagation(){},detail:{value:{title:'New title'}}});
  assert.equal(editor._config.tap_action.url_path,'https://example.com');
+});
+
+function controlCard(config={},light={state:'on',attributes:{brightness:128,supported_color_modes:['brightness']}}){
+ const instance=card({light_entity:'light.display',show_power:true,show_brightness:true,...config});
+ const calls=[];instance.hass={...hass,states:{...hass.states,'light.display':light},callService:async(...args)=>{calls.push(args);}};
+ return {instance,calls};
+}
+test('display controls are opt-in, independently selectable and validated',()=>{
+ assert.equal(card()._config.show_power,false);assert.equal(card()._config.show_brightness,false);
+ assert.equal(card()._renderControls(),'');
+ assert.throws(()=>card({light_entity:'sensor.live'}));assert.throws(()=>card({show_power:'true'}));
+ const {instance}=controlCard({show_brightness:false});
+ assert.doesNotMatch(instance._renderControls(),/<input/);assert.match(instance._renderControls(),/<button/);
+ assert.match(controlCard({show_power:false}).instance._renderControls(),/<input/);
+ assert.doesNotMatch(controlCard({show_power:false}).instance._renderControls(),/<button/);
+});
+test('power and brightness call standard HA services without optimistic state',async()=>{
+ const {instance,calls}=controlCard();let actions=0;instance.addEventListener('hass-action',()=>actions++);
+ await instance._togglePower();await instance._brightnessChanged({target:{value:'200'}});
+ assert.equal(calls[0][0],'light');assert.equal(calls[0][1],'turn_off');assert.equal(calls[0][2].entity_id,'light.display');
+ assert.equal(calls[1][1],'turn_on');assert.equal(calls[1][2].brightness,200);
+ assert.equal(instance._controlState().attributes.brightness,128);assert.equal(actions,0);
+ const off=controlCard({}, {state:'off',attributes:{}});await off.instance._togglePower();assert.equal(off.calls[0][1],'turn_on');
+ for(const value of ['NaN','-1','0','256','1.5'])await instance._brightnessChanged({target:{value}});
+ assert.equal(calls.length,2);
+});
+test('unavailable lights cannot send commands and errors are displayed',async()=>{
+ const {instance,calls}=controlCard({}, {state:'unavailable',attributes:{}});
+ await instance._togglePower();await instance._brightnessChanged({target:{value:'100'}});assert.equal(calls.length,0);
+ assert.match(instance._renderControls(),/nicht verfügbar/);
+ const failed=controlCard().instance;failed.hass.callService=async()=>{throw new Error('Command rejected');};
+ await failed._togglePower();assert.match(failed._controlError,/Command rejected/);assert.equal(failed._controlBusy,false);
+ assert.match(failed._renderControls(),/role="alert"/);
+});
+test('pending controls block duplicate calls and light feedback triggers rendering',async()=>{
+ const {instance}=controlCard();let release,calls=0;
+ instance.hass.callService=()=>{calls++;return new Promise(resolve=>release=resolve);};
+ const pending=instance._togglePower();await instance._togglePower();assert.equal(calls,1);
+ release();await pending;assert.equal(instance._controlBusy,false);
+ const previous=instance.hass;
+ instance.hass={...previous,states:{...previous.states,'light.display':{state:'off',attributes:{}}}};
+ assert.equal(instance.shouldUpdate(new Map([['hass',previous]])),true);
+ assert.ok(instance.getCardSize()>card().getCardSize());
 });
