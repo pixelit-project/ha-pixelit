@@ -15,12 +15,13 @@ function liveviewEntities(hass){
 
 // ===== i18n =====
 const I18N={
-  de:{title:"Titel",entity:"PixelIt-Sensor",width:"Matrix-Breite (Pixel)",height:"Matrix-Höhe (Pixel)",gap:"Abstand zwischen Pixeln (px)",show_header:"Titel anzeigen",transparent:"Transparenter Hintergrund",advanced:"Erweitert",show_status:"Verbindungsstatus anzeigen",show_pixels:"Pixel anzeigen",general:"Allgemein",display:"Anzeige",connected:"Verbunden",disconnected:"Getrennt",no_data:"Warte auf Bilddaten",no_entity:"Kein PixelIt-Sensor ausgewählt",missing_entity:"PixelIt-Sensor nicht verfügbar",card_title:"PixelIt",pixelit_settings:"PixelIt-Einstellungen",display_options:"Anzeige-Optionen"},
-  en:{title:"Title",entity:"PixelIt sensor",width:"Matrix width (pixels)",height:"Matrix height (pixels)",gap:"Gap between pixels (px)",show_header:"Show title",transparent:"Transparent background",advanced:"Advanced",show_status:"Show connection status",show_pixels:"Show pixels",general:"General",display:"Display",connected:"Connected",disconnected:"Disconnected",no_data:"Waiting for a frame",no_entity:"No PixelIt sensor selected",missing_entity:"PixelIt sensor unavailable",card_title:"PixelIt",pixelit_settings:"PixelIt settings",display_options:"Display options"}
+  de:{actions:"Aktionen",tap_action:"Tippen",hold_action:"Gedrückt halten",double_tap_action:"Doppeltippen",title:"Titel",entity:"PixelIt-Sensor",width:"Matrix-Breite (Pixel)",height:"Matrix-Höhe (Pixel)",gap:"Abstand zwischen Pixeln (px)",show_header:"Titel anzeigen",transparent:"Transparenter Hintergrund",advanced:"Erweitert",show_status:"Verbindungsstatus anzeigen",show_pixels:"Pixel anzeigen",general:"Allgemein",display:"Anzeige",connected:"Verbunden",disconnected:"Getrennt",no_data:"Warte auf Bilddaten",no_entity:"Kein PixelIt-Sensor ausgewählt",missing_entity:"PixelIt-Sensor nicht verfügbar",card_title:"PixelIt",pixelit_settings:"PixelIt-Einstellungen",display_options:"Anzeige-Optionen"},
+  en:{actions:"Actions",tap_action:"Tap",hold_action:"Hold",double_tap_action:"Double tap",title:"Title",entity:"PixelIt sensor",width:"Matrix width (pixels)",height:"Matrix height (pixels)",gap:"Gap between pixels (px)",show_header:"Show title",transparent:"Transparent background",advanced:"Advanced",show_status:"Show connection status",show_pixels:"Show pixels",general:"General",display:"Display",connected:"Connected",disconnected:"Disconnected",no_data:"Waiting for a frame",no_entity:"No PixelIt sensor selected",missing_entity:"PixelIt sensor unavailable",card_title:"PixelIt",pixelit_settings:"PixelIt settings",display_options:"Display options"}
 };
 function getLang(hass){const lang=(hass.locale?.language||hass.language||"en").split("-")[0];return I18N[lang]?lang:"en";}
 function tr(hass,key){if(!hass)return I18N.en[key]||key;const lang=getLang(hass);return(I18N[lang]&&I18N[lang][key])||I18N.en[key]||key;}
 
+const ACTION_DEFAULTS={tap_action:"more-info",hold_action:"none",double_tap_action:"none"};
 const CARD_DEFAULTS={title:"",entity:"",gap:1,show_header:true,show_status:true,show_pixels:true,transparent:false};
 function normalizeConfig(config){
   if(!config||typeof config!=="object"||Array.isArray(config))throw new Error("Invalid PixelIt card configuration");
@@ -31,6 +32,11 @@ function normalizeConfig(config){
   if(!Number.isInteger(result.gap)||result.gap<0||result.gap>16)throw new Error("Pixel gap must be an integer from 0 to 16");
   for(const key of ["show_header","show_status","show_pixels","transparent"]){
     if(typeof result[key]!=="boolean")throw new Error(key+" must be true or false");
+  }
+  for(const key of ["tap_action","hold_action","double_tap_action"]){
+    const action=result[key]??{action:ACTION_DEFAULTS[key]};
+    if(typeof action!=="object"||Array.isArray(action)||typeof action.action!=="string")throw new Error(key+" must be an action configuration");
+    result[key]={...action};
   }
   return result;
 }
@@ -57,6 +63,9 @@ let PLEditor=class extends re{
       {name:"show_status",selector:{boolean:{}}},
       {name:"show_pixels",selector:{boolean:{}}},
       {name:"transparent",selector:{boolean:{}}},
+      {name:"",type:"expandable",title:tr(this.hass,"actions"),flatten:true,schema:[
+        ...["tap_action","hold_action","double_tap_action"].map(name=>({name,selector:{ui_action:{default_action:ACTION_DEFAULTS[name]}}}))
+      ]},
       {name:"",type:"expandable",title:tr(this.hass,"advanced"),flatten:true,schema:[
         {name:"gap",selector:{number:{min:0,max:16,step:1,mode:"box"}}}
       ]}
@@ -75,7 +84,45 @@ PLEditor=e([ce(EDITOR_TAG)],PLEditor);
 
 // ===== Main Card =====
 let PixelItLiveviewCard=class extends re{
-  setConfig(config){this._config=normalizeConfig(config);}
+  setConfig(config){this._clearGestures();this._config=normalizeConfig(config);}
+  disconnectedCallback(){this._clearGestures();super.disconnectedCallback();}
+  _clearGestures(){
+    clearTimeout(this._holdTimer);clearTimeout(this._tapTimer);
+    this._holdTimer=this._tapTimer=undefined;this._pointer=undefined;this._held=false;
+  }
+  _hasAction(kind){return this._config?.[kind+"_action"]?.action!=="none"&&!!this._config?.[kind+"_action"];}
+  _interactive(){return ["tap","hold","double_tap"].some(kind=>this._hasAction(kind));}
+  _runAction(kind){
+    if(!this._hasAction(kind)||!this.hass)return;
+    // HA executes the action, including confirmation, targets and custom events.
+    this.dispatchEvent(new CustomEvent("hass-action",{detail:{config:this._config,action:kind},bubbles:true,composed:true}));
+  }
+  _pointerDown(event){
+    if(!this._interactive()||event.isPrimary===false||event.button!==0)return;
+    clearTimeout(this._holdTimer);
+    this._held=false;this._pointer={id:event.pointerId,x:event.clientX,y:event.clientY};
+    if(this._hasAction("hold"))this._holdTimer=setTimeout(()=>{
+      clearTimeout(this._tapTimer);this._tapTimer=undefined;
+      this._held=true;this._runAction("hold");
+    },500);
+  }
+  _pointerMove(event){
+    if(this._pointer&&(Math.abs(event.clientX-this._pointer.x)>10||Math.abs(event.clientY-this._pointer.y)>10))this._clearGestures();
+  }
+  _pointerUp(event){
+    if(!this._pointer||event.pointerId!==this._pointer.id)return;
+    clearTimeout(this._holdTimer);this._pointer=undefined;
+    if(this._held){this._held=false;return;}
+    if(!this._hasAction("double_tap")){this._runAction("tap");return;}
+    if(this._tapTimer){clearTimeout(this._tapTimer);this._tapTimer=undefined;this._runAction("double_tap");}
+    else this._tapTimer=setTimeout(()=>{this._tapTimer=undefined;this._runAction("tap");},250);
+  }
+  _keyDown(event){
+    if(event.repeat||!["Enter"," "].includes(event.key)||!this._interactive())return;
+    event.preventDefault();this._clearGestures();
+    this._runAction(event.shiftKey?"hold":"tap");
+  }
+  _contextMenu(event){if(this._hasAction("hold"))event.preventDefault();}
   getCardSize(){
     const measured=this.getBoundingClientRect().height;
     if(measured>0)return Math.max(1,Math.ceil(measured/50));
@@ -173,12 +220,18 @@ let PixelItLiveviewCard=class extends re{
         }
       }
     }
-    return V`<ha-card class=${cfg.transparent?"plc transparent":"plc"}><div class="plc-inner">${cfg.show_header||(cfg.show_status&&data)?V`<div class="plc-header">${cfg.show_header?V`<span class="plc-title">${title}</span>`:W}${cfg.show_status&&data?V`<span class="plc-status ${statusClass}" role="status">${statusText}</span>`:W}</div>`:W}${cfg.show_pixels&&hasPixels?V`<div class="plc-grid" role="img" aria-label=${title} style="${gridStyle}">${cells}</div>`:W}${message?V`<div class="plc-empty" role="status">${message}</div>`:W}</div></ha-card>`;
+    return V`<ha-card class=${cfg.transparent?"plc transparent":"plc"}
+      tabindex=${this._interactive()?"0":"-1"} role=${this._interactive()?"button":W}
+      aria-label=${title} @pointerdown=${this._pointerDown} @pointermove=${this._pointerMove}
+      @pointerup=${this._pointerUp} @pointercancel=${this._clearGestures} @pointerleave=${this._clearGestures}
+      @keydown=${this._keyDown} @contextmenu=${this._contextMenu}><div class="plc-inner">${cfg.show_header||(cfg.show_status&&data)?V`<div class="plc-header">${cfg.show_header?V`<span class="plc-title">${title}</span>`:W}${cfg.show_status&&data?V`<span class="plc-status ${statusClass}" role="status">${statusText}</span>`:W}</div>`:W}${cfg.show_pixels&&hasPixels?V`<div class="plc-grid" role="img" aria-label=${title} style="${gridStyle}">${cells}</div>`:W}${message?V`<div class="plc-empty" role="status">${message}</div>`:W}</div></ha-card>`;
   }
 };
 PixelItLiveviewCard.styles=a`
 :host{display:block;min-width:0;}
 ha-card{overflow:hidden;}
+ha-card[role="button"]{cursor:pointer;}
+ha-card:focus-visible{outline:2px solid var(--primary-color);outline-offset:2px;}
 ha-card.transparent{background:transparent;box-shadow:none;border:none;}
 .plc-inner{display:flex;flex-direction:column;gap:12px;padding:16px;container-type:inline-size;min-width:0;}
 .plc-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;min-width:0;}

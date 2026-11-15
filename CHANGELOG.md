@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- (o0shojo0o) Add optional, independently configurable tap, hold and double-tap card actions in the visual editor and YAML; tap defaults to more information, while hold and double-tap default to no action, matching the HA entity card for sensors.
+
 ## 2.1.1 — 2026-11-14
 - (o0shojo0o) Fix all displays disconnecting on Home Assistant 2026.11 when firmware update entity state is written, and allow reload after a failed WebSocket task.
 

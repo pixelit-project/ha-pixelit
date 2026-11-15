@@ -7,8 +7,9 @@ const {test} = require('node:test');
 const source=readFileSync(resolve(__dirname,'../../custom_components/pixelit/www/pixelit-card.js'),'utf8');
 const registry=new Map();
 const html=(strings,...values)=>strings.reduce((result,part,i)=>result+part+(values[i]??''),'');
-class Element extends EventTarget{getBoundingClientRect(){return {height:0};}}
+class Element extends EventTarget{disconnectedCallback(){} getBoundingClientRect(){return {height:0};}}
 const context=vm.createContext({
+  setTimeout,clearTimeout,
   re:Element,V:html,a:html,W:'',
   e:(decorators,target,...args)=>{for(const decorate of decorators){target=decorate(target,...args)||target;}return target;},
   ce:name=>type=>{registry.set(name,type);return type;},
@@ -39,8 +40,8 @@ test('status remains visible with title hidden',()=>{
  assert.doesNotMatch(card({show_header:false,show_status:false}).render(),/plc-status/);
 });
 test('theme card is default and transparency is explicit',()=>{
- assert.match(card().render(),/class=plc>/);
- assert.match(card({transparent:true}).render(),/class=plc transparent>/);
+ assert.match(card().render(),/class=plc\s/);
+ assert.match(card({transparent:true}).render(),/class=plc transparent\s/);
 });
 test('missing frames show a useful message without an empty pixel grid',()=>{
  const instance=card({entity:''});assert.match(instance.render(),/Kein PixelIt-Sensor/);assert.doesNotMatch(instance.render(),/class="plc-grid"/);
@@ -84,4 +85,69 @@ test('diagnostic and environmental sensors are excluded from Liveview selection'
  assert.equal(suggest(withReadings,'sensor.live').config.entity,'sensor.live');
  const editor=new Editor();editor.hass=withReadings;editor.setConfig({entity:'sensor.live'});editor.render();
  assert.deepEqual(Array.from(editor._schema[0].selector.entity.include_entities),['sensor.live']);
+});
+
+const pointer=(x=0)=>({button:0,pointerId:1,clientX:x,clientY:0});
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+test('actions follow HA sensor defaults and native editor exposes all three',()=>{
+ const instance=card();assert.equal(instance._interactive(),true);
+ for(const key of ['tap_action','hold_action','double_tap_action']){
+  assert.equal(instance._config[key].action,key==='tap_action'?'more-info':'none');assert.throws(()=>card({[key]:'toggle'}));
+ }
+ const editor=new Editor();editor.hass=hass;editor.setConfig({entity:'sensor.live'});editor.render();
+ const fields=editor._schema.flatMap(field=>field.schema||[]).filter(field=>field.selector?.ui_action);
+ assert.deepEqual(Array.from(fields,field=>field.name),['tap_action','hold_action','double_tap_action']);
+ assert.deepEqual(Array.from(fields,field=>field.selector.ui_action.default_action),['more-info','none','none']);
+ let detail;instance.addEventListener('hass-action',event=>detail=event.detail);
+ instance._pointerDown(pointer());instance._pointerUp(pointer());
+ assert.equal(detail.config.tap_action.action,'more-info');
+ assert.equal(detail.config.entity,'sensor.live');
+});
+test('tap forwards full action configuration to Home Assistant',()=>{
+ const instance=card({tap_action:{action:'perform-action',perform_action:'light.toggle',target:{entity_id:'light.display'},confirmation:true}});
+ let detail;instance.addEventListener('hass-action',event=>detail=event.detail);
+ instance._pointerDown(pointer());instance._pointerUp(pointer());
+ assert.equal(detail.action,'tap');assert.equal(detail.config.tap_action.target.entity_id,'light.display');
+ assert.equal(detail.config.tap_action.confirmation,true);
+});
+test('double tap suppresses single tap and a single tap still works',async()=>{
+ const instance=card({tap_action:{action:'more-info'},double_tap_action:{action:'navigate',navigation_path:'/test'}});
+ const actions=[];instance.addEventListener('hass-action',event=>actions.push(event.detail.action));
+ for(let i=0;i<2;i++){instance._pointerDown(pointer());instance._pointerUp(pointer());}
+ await wait(280);assert.deepEqual(actions,['double_tap']);
+ instance._pointerDown(pointer());instance._pointerUp(pointer());await wait(280);
+ assert.deepEqual(actions,['double_tap','tap']);
+});
+test('hold suppresses tap, movement cancels and replacement clears pending gestures',async()=>{
+ const instance=card({tap_action:{action:'more-info'},hold_action:{action:'toggle'}});
+ const actions=[];instance.addEventListener('hass-action',event=>actions.push(event.detail.action));
+ instance._pointerDown(pointer());await wait(530);instance._pointerUp(pointer());
+ assert.deepEqual(actions,['hold']);
+ instance._pointerDown(pointer());instance._pointerMove(pointer(20));instance._pointerUp(pointer(20));
+ instance._pointerDown(pointer());instance.setConfig({entity:'sensor.live'});await wait(530);
+ assert.deepEqual(actions,['hold']);
+});
+test('keyboard runs optional tap and shift-hold actions',()=>{
+ const instance=card({tap_action:{action:'more-info'},hold_action:{action:'toggle'}});
+ const actions=[];instance.addEventListener('hass-action',event=>actions.push(event.detail.action));
+ instance._keyDown({key:'Enter',preventDefault(){}});
+ instance._keyDown({key:' ',shiftKey:true,preventDefault(){}});
+ assert.deepEqual(actions,['tap','hold']);
+});
+
+test('unload and pointer cancellation clear pending actions',async()=>{
+ for(const cancel of [instance=>instance.disconnectedCallback(),instance=>instance._clearGestures()]){
+  const instance=card({tap_action:{action:'more-info'},double_tap_action:{action:'navigate'}});
+  let calls=0;instance.addEventListener('hass-action',()=>calls++);
+  instance._pointerDown(pointer());instance._pointerUp(pointer());cancel(instance);
+  await wait(280);assert.equal(calls,0);
+ }
+});
+test('disabled actions never dispatch and action settings survive editor changes',()=>{
+ const instance=card({tap_action:{action:'none'}});let calls=0;instance.addEventListener('hass-action',()=>calls++);
+ instance._pointerDown(pointer());instance._pointerUp(pointer());instance._runAction('tap');
+ assert.equal(calls,0);assert.match(instance.render(),/tabindex=-1/);
+ const editor=new Editor();editor.hass=hass;editor.setConfig({tap_action:{action:'url',url_path:'https://example.com'}});
+ editor._valueChanged({stopPropagation(){},detail:{value:{title:'New title'}}});
+ assert.equal(editor._config.tap_action.url_path,'https://example.com');
 });

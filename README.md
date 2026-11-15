@@ -85,6 +85,34 @@ cards. Enable **Transparent background** to use the earlier frameless appearance
 | `show_status` | bool | true | Show connection status badge |
 | `show_pixels` | bool | true | Show the pixel grid |
 | `transparent` | bool | false | Hide the card background and border |
+| `tap_action` | object | `action: more-info` | Optional action when tapping the card |
+| `hold_action` | object | `action: none` | Optional action when holding the card |
+| `double_tap_action` | object | `action: none` | Optional action when double-tapping the card |
+
+Under **Actions**, independently choose what tapping, holding or double-tapping
+should do using the Home Assistant action selector. Like the standard HA entity
+card for sensors, tapping defaults to **More information** for the Liveview sensor;
+holding and double-tapping default to **None**. Each can be overridden, including
+setting tapping to **None**.
+For example, choose **More information**, navigate to a dashboard, open a URL,
+or perform an action on a separately selected PixelIt light or script. Opening a
+custom popup requires a corresponding action provided by your popup integration.
+Keyboard users can press Enter or Space for the tap action, or Shift with either
+key for the hold action. Scrolling or dragging cancels the gesture.
+
+Optional YAML example (replace both entity IDs with your own):
+
+```yaml
+type: custom:pixelit-card
+entity: sensor.your_pixelit_liveview
+tap_action:
+  action: more-info
+hold_action:
+  action: perform-action
+  perform_action: light.toggle
+  target:
+    entity_id: light.your_pixelit
+```
 
 ![PixelIt card editor with Liveview sensor selection, visibility switches and advanced pixel spacing](images/screenshot-editor.png)
 
