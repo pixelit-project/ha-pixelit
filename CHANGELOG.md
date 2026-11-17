@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+
+## 2.2.1 — 2026-11-17
 - (o0shojo0o) Build and commit the dashboard card automatically when preparing a release.
 - (o0shojo0o) Include modular dashboard card sources and a reproducible build using public npm packages.
 
