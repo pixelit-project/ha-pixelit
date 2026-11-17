@@ -25,7 +25,7 @@ npm run build
 npm run check
 ```
 
-The readable card and editor source is in `src/pixelit-card.js`. Build instructions
+The modular card source is in `src/`; `src/pixelit-card.js` is its entry point. Build instructions
 and dependency details are in [Card development](../docs/card-development.md).
 `npm test` runs the behavior tests against the source with Lit/DOM test doubles,
 and additional runtime contracts against both the source and shipped bundle with

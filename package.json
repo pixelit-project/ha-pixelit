@@ -10,8 +10,8 @@
     "build": "node scripts/build-card.mjs",
     "build:check": "node scripts/build-card.mjs --check",
     "test": "node --conditions=browser --test tests/frontend/*.test.cjs tests/frontend/*.test.mjs",
-    "format:card": "prettier --write src/pixelit-card.js scripts/build-card.mjs tests/frontend/*.mjs",
-    "format:check": "prettier --check src/pixelit-card.js scripts/build-card.mjs tests/frontend/*.mjs",
+    "format:card": "prettier --write \"src/**/*.js\" scripts/build-card.mjs \"tests/frontend/*.{cjs,mjs}\"",
+    "format:check": "prettier --check \"src/**/*.js\" scripts/build-card.mjs \"tests/frontend/*.{cjs,mjs}\"",
     "check": "npm run format:check && npm run build:check && npm test"
   },
   "dependencies": {

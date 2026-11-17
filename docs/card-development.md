@@ -1,10 +1,28 @@
 # Dashboard card development
 
-The maintained, readable source for the card, editor, styles and translations is
-[`src/pixelit-card.js`](../src/pixelit-card.js). It was extracted from the previously
+The maintained, readable source lives in `src/`, with
+[`src/pixelit-card.js`](../src/pixelit-card.js) as its public entry point. It was extracted from the previously
 shipped bundle; the earlier original source files were not available. The embedded
 Lit implementation was replaced with imports from the public `lit` npm package.
 The original MIT attribution remains in the source and repository license.
+
+## Source layout
+
+| File | Purpose |
+| --- | --- |
+| `src/pixelit-card.js` | Public entry point, element registration and dashboard metadata |
+| `src/card.js` | Live display rendering, controls, actions and lifecycle |
+| `src/editor.js` | Native Home Assistant card editor |
+| `src/config.js` | Shared identifiers, defaults and configuration validation |
+| `src/entities.js` | Liveview sensor selection |
+| `src/styles.js` | Card and editor styles |
+| `src/i18n/de.js`, `src/i18n/en.js` | German and English translations |
+| `src/i18n/index.js` | Language selection and translation fallback |
+
+Dependencies flow from the entry point to the card/editor and shared modules;
+shared modules do not import the entry point or register custom elements.
+Translations use native JavaScript modules so source tests and browsers can import
+them without JSON import assertions. All modules are bundled into one installed file.
 
 ## Install and build
 
@@ -41,7 +59,8 @@ No firmware, device protocol or user configuration changes are required.
 
 ## Validation
 
-`npm run check` runs formatting, build consistency and all card tests. The existing
+`npm run check` runs formatting, build consistency and all card tests, including
+matching translation keys, nonempty translations and language fallback. The existing
 behavior tests cover configuration, sensor selection, gestures and display controls
 with lightweight Lit/DOM doubles. Additional contract tests import the source and
 shipped module in isolated processes, each using real Lit and jsdom. They verify
