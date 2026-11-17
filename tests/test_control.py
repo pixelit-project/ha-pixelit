@@ -82,9 +82,11 @@ class Socket:
         self.client = client
         self.response = response
         self.sent = []
+        self.frames = []
 
-    async def send_json(self, data):
-        self.sent.append(data)
+    async def send_str(self, frame):
+        self.frames.append(frame.encode("utf-8"))
+        self.sent.append(json.loads(frame))
         await asyncio.sleep(0)
         if self.response is not None:
             self.client._handle_message(json.dumps({"response": self.response}))
@@ -106,6 +108,13 @@ class ControlTests(unittest.IsolatedAsyncioTestCase):
             runtime_data=self.client,
         )
         self.light = light.PixelItLight(self.entry)
+
+    async def test_screen_text_is_sent_as_utf8(self):
+        await self.light.async_show_message(
+            **vol.Schema(services.ACTION_SCHEMAS["show_message"])({"message": "9.1°"})
+        )
+
+        self.assertIn("9.1°".encode("utf-8"), self.ws.frames[-1])
 
     async def test_power_brightness_and_device_feedback(self):
         self.assertFalse(self.light.available)

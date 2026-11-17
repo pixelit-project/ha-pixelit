@@ -16,7 +16,7 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from yarl import URL
 
-from .screens import ScreenPlayer
+from .screens import ScreenPlayer, encode_screen_command
 from .transitions import validate_firmware_transition
 
 _LOGGER = logging.getLogger(__name__)
@@ -204,9 +204,7 @@ class PixelItCoordinator:
                     if self._stopping:
                         raise HomeAssistantError("PixelIt is unloading")
                     self._response = asyncio.get_running_loop().create_future()
-                    await ws.send_json(
-                        {"setScreen": screen, "forcedDuration": duration}
-                    )
+                    await ws.send_str(encode_screen_command(screen, duration))
                     response = await asyncio.wait_for(self._response, COMMAND_TIMEOUT)
                     if response != "OK":
                         raise HomeAssistantError(

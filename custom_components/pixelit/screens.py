@@ -34,6 +34,15 @@ def duration_seconds(value, *, allow_zero=False) -> float:
     return float(value)
 
 
+def encode_screen_command(screen: dict, duration: int) -> str:
+    """Serialize a screen command with firmware-compatible UTF-8 text."""
+    return json.dumps(
+        {"setScreen": screen, "forcedDuration": duration},
+        ensure_ascii=False,
+        allow_nan=False,
+    )
+
+
 def validate_screen(screen: dict, width: int, height: int) -> dict:
     """Validate display-only payloads before storing or sending them."""
     if (
@@ -60,12 +69,10 @@ def validate_screen(screen: dict, width: int, height: int) -> dict:
         if "hexColor" not in text and "color" not in text:
             text["hexColor"] = "#FFFFFF"
     try:
-        encoded = json.dumps(
-            {"setScreen": screen, "forcedDuration": 86400000}, allow_nan=False
-        )
+        encoded = encode_screen_command(screen, 86400000).encode("utf-8")
     except (TypeError, ValueError, RecursionError) as err:
         raise ServiceValidationError("Screen must contain finite JSON values") from err
-    if len(encoded.encode()) > MAX_PAYLOAD_BYTES:
+    if len(encoded) > MAX_PAYLOAD_BYTES:
         raise ServiceValidationError(
             "Screen exceeds the ESP8266 WebSocket payload budget"
         )
