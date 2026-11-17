@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+
+## 2.3.1 — 2026-11-17
 - (o0shojo0o) Send degree signs and other non-ASCII screen text as UTF-8 to PixelIt.
 
 ## 2.3.0 — 2026-11-17
