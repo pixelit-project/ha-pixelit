@@ -387,6 +387,8 @@ options, supported limits and implementation details.
 
 For advanced options and limits, see the [technical reference](docs/technical-reference.md).
 For development and host test instructions, see [tests/README.md](tests/README.md).
+The dashboard card sources and build instructions are documented in
+[Card development](docs/card-development.md).
 
 ## Credits
 

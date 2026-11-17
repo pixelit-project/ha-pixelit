@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   version:
-    name: Prepare release version and changelog
+    name: Build card and prepare release
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -39,7 +39,14 @@ jobs:
             echo "::error::This tag already has a release; published releases are not modified."
             exit 1
           fi
-      - name: Prepare and push release metadata
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install locked card build dependencies
+        run: npm ci
+      - name: Build card, prepare and push release
         id: version
         env:
           RELEASE_TAG: ${{ github.ref_name }}

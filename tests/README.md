@@ -16,8 +16,23 @@ or firmware rendering; those require a running Home Assistant and PixelIt device
 
 ## Dashboard card
 
-Run `node --test tests/frontend/card.test.cjs` for editor/card behavior tests.
-These use Lit/DOM test doubles and do not verify actual HA form rendering.
+Use Node.js 22.22.2+, 24.15.0+ or 26+ (`.nvmrc` selects Node.js 22).
+From the repository root:
+
+```sh
+npm ci
+npm run build
+npm run check
+```
+
+The readable card and editor source is in `src/pixelit-card.js`. Build instructions
+and dependency details are in [Card development](../docs/card-development.md).
+`npm test` runs the behavior tests against the source with Lit/DOM test doubles,
+and additional runtime contracts against both the source and shipped bundle with
+real Lit in jsdom. Runtime tests cover reactive rendering, registration, escaping,
+control bindings, pending/error state and editor events. jsdom does not validate
+browser layout or Home Assistant's own form components. `npm run check` also checks
+formatting and compares a fresh build byte for byte with the shipped bundle.
 
 For a visual check, serve the repository using `python3 -m http.server 8765` and
 open `http://127.0.0.1:8765/tests/frontend/card-preview.html`. The fixture renders

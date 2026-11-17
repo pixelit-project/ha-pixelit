@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run in the authenticated Actions checkout. Never overwrite concurrent changes.
+# Build the card and prepare the authenticated Actions checkout. Never overwrite concurrent changes.
 set -euo pipefail
 
 : "${RELEASE_TAG:?}"
@@ -19,14 +19,17 @@ if [[ "$tag_commit" != "$branch_commit" ]]; then
   exit 1
 fi
 git checkout --detach "$tag_commit"
+# Dependencies are installed with npm ci by the release workflow.
+# Build failures must happen before committing or updating either remote ref.
+npm run build
 python scripts/release_changelog.py prepare "$RELEASE_TAG" --date "$(date -u +%F)"
 python scripts/release_changelog.py notes "$RELEASE_TAG" --output "$RUNNER_TEMP/release-notes.md"
 GITHUB_REF_NAME="$RELEASE_TAG" python scripts/release_version.py
 
-if ! git diff --quiet -- CHANGELOG.md custom_components/pixelit/manifest.json; then
+if ! git diff --quiet -- CHANGELOG.md custom_components/pixelit/manifest.json custom_components/pixelit/www/pixelit-card.js; then
   git config user.name 'github-actions[bot]'
   git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-  git add CHANGELOG.md custom_components/pixelit/manifest.json
+  git add CHANGELOG.md custom_components/pixelit/manifest.json custom_components/pixelit/www/pixelit-card.js
   git commit -m "Prepare release $RELEASE_TAG"
   # Push both references together, or neither. Leases guard both against races.
   git push --atomic \

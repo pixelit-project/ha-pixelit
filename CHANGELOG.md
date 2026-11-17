@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+- (o0shojo0o) Build and commit the dashboard card automatically when preparing a release.
+- (o0shojo0o) Include readable dashboard card sources and a reproducible build using public npm packages.
 
 ## 2.2.0 — 2026-11-15
 - (o0shojo0o) Add optional card power and brightness controls with a separately selected Display light; both are hidden by default.

@@ -1,9 +1,10 @@
 # Publishing releases
 
 Push a version tag on the current default branch tip. The Release workflow
-automatically prepares the version and changelog, validates the prepared commit,
+automatically builds the dashboard card and prepares the version and changelog,
+validates the prepared commit,
 and publishes a GitHub release using the changelog notes. No manual version bump
-or preparation command is required. Both `v`-prefixed and unprefixed tags work.
+or local card build is required. Both `v`-prefixed and unprefixed tags work.
 
 | Tag example | Automatic manifest version | Changelog behavior | GitHub release |
 | --- | --- | --- | --- |
@@ -23,7 +24,8 @@ git push origin v2.1.0-beta.1
 
 ## Automatic preparation
 
-The workflow commits the manifest/changelog changes as `github-actions[bot]`,
+The workflow installs the locked npm dependencies and builds the card from `src/`.
+It commits the generated card together with manifest/changelog changes as `github-actions[bot]`,
 pushes that commit to the default branch and **moves the triggering tag to the
 prepared commit**. This converts an annotated trigger tag to a lightweight tag;
 do not use signed release tags with this process. Both references are updated
@@ -49,6 +51,10 @@ section body is published, without the heading or older versions.
 
 ## Validation and publication
 
+Regular branch and pull request checks build the card before testing, so source
+changes can be pushed without rebuilding or committing generated JavaScript locally.
+Release validation instead checks that the committed card matches its source exactly.
+
 HACS, Hassfest and Python/JavaScript host checks run against the exact prepared
 commit before publication. The workflow explicitly checks out that commit because
 the event's original commit predates preparation. Pushes using `GITHUB_TOKEN` do
@@ -61,7 +67,7 @@ Missing, empty or duplicate release-note sections fail preparation. Beta and RC
 releases are marked as prereleases and never promoted to Latest. Stable releases
 use GitHub's default Latest selection. Choose one spelling per version to avoid
 duplicate releases. HACS downloads the prepared tagged source, including the
-correct manifest version and changelog.
+correct manifest version, changelog and freshly built card.
 
 For optional local previews, `python3 scripts/release_changelog.py prepare TAG`
 updates metadata without committing or pushing. This is not required for releases.

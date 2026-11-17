@@ -63,7 +63,27 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Check Python syntax
         run: python -m compileall -q custom_components scripts tests
-      - name: Test card behavior
-        run: node --test tests/frontend/card.test.cjs
+
+  frontend:
+    name: Card source, build and runtime tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.ref || github.sha }}
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install locked frontend dependencies
+        run: npm ci
+      - name: Build card for branch and pull request tests
+        if: ${{ inputs.ref == '' }}
+        run: npm run build
+      - name: Check formatting, rebuild consistency and card behavior
+        run: npm run check
       - name: Check card syntax
         run: node --check custom_components/pixelit/www/pixelit-card.js

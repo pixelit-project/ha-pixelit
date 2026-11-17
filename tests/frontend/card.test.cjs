@@ -1,24 +1,21 @@
-// Exercise the shipped card/editor logic with a minimal Lit/DOM test double.
+// Exercise the readable card/editor source with a minimal Lit/DOM test double.
 const assert = require('node:assert/strict');
 const {readFileSync} = require('node:fs');
 const {resolve} = require('node:path');
 const vm = require('node:vm');
 const {test} = require('node:test');
-const source=readFileSync(resolve(__dirname,'../../custom_components/pixelit/www/pixelit-card.js'),'utf8');
+const source=readFileSync(resolve(__dirname,'../../src/pixelit-card.js'),'utf8');
 const registry=new Map();
 const html=(strings,...values)=>strings.reduce((result,part,i)=>result+part+(values[i]??''),'');
 class Element extends EventTarget{disconnectedCallback(){} getBoundingClientRect(){return {height:0};}}
 const context=vm.createContext({
   setTimeout,clearTimeout,
-  re:Element,V:html,a:html,W:'',
-  e:(decorators,target,...args)=>{for(const decorate of decorators){target=decorate(target,...args)||target;}return target;},
-  ce:name=>type=>{registry.set(name,type);return type;},
-  pe:()=>()=>{},ue:()=>()=>{},
+  LitElement:Element,html,css:html,nothing:'',
   CustomEvent:class extends Event{constructor(name,options){super(name,options);this.detail=options.detail;}},
   customElements:{get:name=>registry.get(name),define:(name,type)=>registry.set(name,type)},
   document:{createElement:name=>new (registry.get(name))()},window:{customCards:[]},
 });
-vm.runInContext(source.slice(source.indexOf('const CARD_NAME=')).replace(/export\{[^}]+\};?\s*$/,''),context);
+vm.runInContext(source.replace(/^import .* from ["\']lit["\'];?$/m,'').replace(/export\s*\{[^}]+\};?\s*$/,''),context);
 const Card=registry.get('pixelit-card'),Editor=registry.get('pixelit-card-editor');
 const hass={language:'de',entities:{
  'sensor.live':{entity_id:'sensor.live',platform:'pixelit'},
@@ -40,8 +37,8 @@ test('status remains visible with title hidden',()=>{
  assert.doesNotMatch(card({show_header:false,show_status:false}).render(),/plc-status/);
 });
 test('theme card is default and transparency is explicit',()=>{
- assert.match(card().render(),/class=plc>/);
- assert.match(card({transparent:true}).render(),/class=plc transparent>/);
+ assert.match(card().render(),/class=plc\s*>/);
+ assert.match(card({transparent:true}).render(),/class=plc transparent\s*>/);
 });
 test('missing frames show a useful message without an empty pixel grid',()=>{
  const instance=card({entity:''});assert.match(instance.render(),/Kein PixelIt-Sensor/);assert.doesNotMatch(instance.render(),/class="plc-grid"/);

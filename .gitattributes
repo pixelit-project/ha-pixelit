@@ -1,0 +1,2 @@
+# Generated Lit regex strings contain significant trailing whitespace.
+custom_components/pixelit/www/pixelit-card.js whitespace=-blank-at-eol

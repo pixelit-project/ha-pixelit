@@ -1,4 +1,4 @@
-"""Exercise automatic metadata commits and atomic ref updates in local Git repos."""
+"""Exercise card build orchestration, metadata commits and atomic ref updates."""
 
 import json
 import os
@@ -27,6 +27,21 @@ class TagReleaseTests(unittest.TestCase):
         manifest = self.work / 'custom_components/pixelit/manifest.json'
         manifest.parent.mkdir(parents=True)
         manifest.write_text('{"version": "2.0.0"}\n')
+        (self.work / '.gitignore').write_text('__pycache__/\n')
+        self.card = self.work / 'custom_components/pixelit/www/pixelit-card.js'
+        self.card.parent.mkdir(parents=True)
+        self.card.write_text('// Previous build\n')
+        # Keep Git orchestration tests independent of Node/npm. The real card
+        # build and rejection of stale bundles have separate frontend tests.
+        self.bin = self.root / 'bin'
+        self.bin.mkdir()
+        npm = self.bin / 'npm'
+        npm.write_text(f"#!{sys.executable}\n" +
+                       "import os, pathlib, sys\n"
+                       "assert sys.argv[1:] == ['run', 'build']\n"
+                       "if os.environ.get('FAIL_CARD_BUILD'): sys.exit(1)\n"
+                       "pathlib.Path('custom_components/pixelit/www/pixelit-card.js').write_text('// Built card\\n')\n")
+        npm.chmod(0o755)
         self.original = '# Changelog\n\n## Unreleased\n- New\n\n## 2.0.0\n- Old\n'
         (self.work / 'CHANGELOG.md').write_text(self.original)
         self.git('add', '.')
@@ -38,10 +53,12 @@ class TagReleaseTests(unittest.TestCase):
         return subprocess.run(['git', *args], cwd=cwd or self.work, check=True,
                               capture_output=True, text=True).stdout.strip()
 
-    def prepare(self, tag, success=True):
+    def prepare(self, tag, success=True, fail_build=False):
         env = dict(os.environ, RELEASE_TAG=tag, DEFAULT_BRANCH='main',
                    GITHUB_OUTPUT=str(self.root / 'output'), RUNNER_TEMP=str(self.root),
-                   PATH=str(Path(sys.executable).parent) + os.pathsep + os.environ['PATH'])
+                   PATH=str(self.bin) + os.pathsep + str(Path(sys.executable).parent) + os.pathsep + os.environ['PATH'])
+        if fail_build:
+            env['FAIL_CARD_BUILD'] = '1'
         result = subprocess.run(['bash', 'scripts/prepare_tag_release.sh'], cwd=self.work,
                                 env=env, capture_output=True, text=True)
         if success:
@@ -64,6 +81,8 @@ class TagReleaseTests(unittest.TestCase):
         self.assertIn('## Unreleased\n\n## 2.1.0 — ', (self.work / 'CHANGELOG.md').read_text())
         self.assertIn('prerelease=false', (self.root / 'output').read_text())
         self.assertIn('commit=' + head, (self.root / 'output').read_text())
+        self.assertEqual(self.git('show', 'HEAD:custom_components/pixelit/www/pixelit-card.js'), '// Built card')
+        self.assertEqual(self.git('status', '--porcelain'), '')
         self.prepare('v2.1.0')
         self.assertEqual(self.git('rev-parse', 'HEAD'), head)
 
@@ -80,6 +99,31 @@ class TagReleaseTests(unittest.TestCase):
         head = self.git('rev-parse', 'HEAD')
         self.prepare('v2.1.0', success=False)
         self.assertEqual(self.git('--git-dir=' + str(self.remote), 'rev-parse', 'refs/heads/main'), head)
+
+
+    def test_card_only_change_is_committed_when_metadata_already_matches(self):
+        manifest = self.work / 'custom_components/pixelit/manifest.json'
+        manifest.write_text('{"version": "2.1.0b1"}\n')
+        self.git('add', str(manifest))
+        self.git('commit', '-m', 'Version already prepared')
+        self.git('push', 'origin', 'main')
+        old_branch = self.git('rev-parse', 'HEAD')
+        self.tag('v2.1.0-beta.1')
+        self.prepare('v2.1.0-beta.1')
+        head = self.git('rev-parse', 'HEAD')
+        self.assertNotEqual(head, old_branch)
+        self.assertEqual(self.git('show', 'HEAD:custom_components/pixelit/www/pixelit-card.js'), '// Built card')
+        self.assertEqual(self.git('--git-dir=' + str(self.remote), 'rev-parse', 'refs/heads/main'), head)
+        self.assertEqual((self.work / 'CHANGELOG.md').read_text(), self.original)
+
+    def test_build_failure_updates_neither_ref(self):
+        self.tag('v2.1.0')
+        old_tag = self.git('--git-dir=' + str(self.remote), 'rev-parse', 'refs/tags/v2.1.0')
+        old_branch = self.git('rev-parse', 'HEAD')
+        self.prepare('v2.1.0', success=False, fail_build=True)
+        self.assertEqual(self.git('--git-dir=' + str(self.remote), 'rev-parse', 'refs/heads/main'), old_branch)
+        self.assertEqual(self.git('--git-dir=' + str(self.remote), 'rev-parse', 'refs/tags/v2.1.0'), old_tag)
+        self.assertFalse((self.root / 'output').exists())
 
     def test_rejected_push_updates_neither_ref(self):
         self.tag('v2.1.0')
