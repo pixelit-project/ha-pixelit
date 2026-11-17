@@ -122,7 +122,9 @@ set_screen:
           step: 1
           unit_of_measurement: s
           mode: box
-      default: 5
+    show:
+      selector:
+        boolean: {}
     icon:
       example: 42
       selector:

@@ -69,7 +69,8 @@ ACTION_SCHEMAS = {
     "set_screen": {
         **CONTENT_FIELDS,
         vol.Required("name"): NAME,
-        vol.Optional("duration", default=5): seconds,
+        vol.Optional("duration"): seconds,
+        vol.Optional("show"): bool,
     },
     "show_screen": {vol.Required("name"): NAME},
     "set_playlist": {

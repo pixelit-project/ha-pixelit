@@ -97,6 +97,20 @@ rotation and any alert timer, leaving the current display content visible.
 Updating a screen with `set_screen` changes its next playlist turn. Unknown names,
 invalid durations and invalid payloads are rejected before changing playback.
 
+The optional action-level `show` boolean is saved per screen and defaults to
+visible for new and existing screens without a visibility setting. Updating
+content without `show` retains the saved setting. Supplying `name` and `show`
+alone updates visibility while preserving content and duration. You can also
+supply `duration` to change it at the same time. Saving new content without a
+duration uses five seconds.
+
+Playlist playback checks visibility on each turn, including after an alert or
+reconnect. Hiding the current screen lets its current turn finish. If every
+entry is hidden, the display holds its last content and rotation waits for an
+entry to be enabled. Playback resumes when the device is ready. An alert that
+ends while every entry is hidden returns to the clock. `pixelit.show_screen` still displays a hidden
+screen on demand and stops rotation.
+
 Saved screens and playlist order survive reloads and HA restarts. Playback starts
 at the beginning after reload. Temporary alerts, standalone base content, elapsed
 time and playlist position are not persisted. Removing the integration deletes

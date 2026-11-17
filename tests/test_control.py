@@ -244,6 +244,22 @@ class ControlTests(unittest.IsolatedAsyncioTestCase):
             {"clock": {"show": True, "hexColor": "#00FF00"}},
         )
 
+    async def test_set_screen_visibility_only_preserves_content_and_duration(self):
+        schema = vol.Schema(services.ACTION_SCHEMAS["set_screen"])
+        await self.light.async_set_screen(
+            **schema({"name": "seasonal", "message": "Frohes Fest", "duration": 12})
+        )
+        player = self.client.player
+        original = player.screens["seasonal"]
+        await self.light.async_set_screen(**schema({"name": "seasonal", "show": False}))
+        self.assertEqual(player.screens["seasonal"], {**original, "show": False})
+        await self.light.async_set_screen(**schema({"name": "seasonal", "show": True}))
+        self.assertEqual(player.screens["seasonal"], {**original, "show": True})
+        with self.assertRaises(HAError):
+            await self.light.async_set_screen(**schema({"name": "unknown", "show": False}))
+        with self.assertRaises(vol.Invalid):
+            schema({"name": "seasonal", "show": "false"})
+
     async def test_advanced_content_remains_compatible(self):
         screen = {
             "text": {

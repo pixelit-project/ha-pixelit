@@ -109,7 +109,7 @@ class PixelItLight(LightEntity):
         self,
         name: str,
         screen: dict | None = None,
-        duration: float = 5,
+        duration: float | None = None,
         icon: int | None = None,
         icon_animation_delay: int = 100,
         icon_rubberbanding: bool = False,
@@ -122,7 +122,22 @@ class PixelItLight(LightEntity):
         scroll: str = "auto",
         large_font: bool = False,
         center: bool = True,
+        show: bool | None = None,
     ) -> None:
+        if (
+            show is not None
+            and screen is None
+            and message is None
+            and not clock
+            and icon is None
+            and transition in (None, "none")
+            and transition_bitmap is None
+        ):
+            await self._coordinator.player.async_set_screen(
+                name, duration=duration, show=show
+            )
+            return
+
         screen = build_screen(
             screen=screen,
             message=message,
@@ -140,6 +155,7 @@ class PixelItLight(LightEntity):
                 screen, icon, icon_animation_delay, icon_rubberbanding, icon_limit_loops
             ),
             duration,
+            show=show,
         )
 
     async def async_show_screen(self, name: str) -> None:

@@ -248,6 +248,10 @@
           "name": "Custom screen (YAML)",
           "description": "Only for complex displays. Use instead of message or clock. Existing screen objects remain supported."
         },
+        "show": {
+          "name": "Play in playlist",
+          "description": "Skip the screen when disabled. For a saved screen, only its name is needed to change visibility."
+        },
         "duration": {
           "name": "Display duration",
           "description": "Seconds per turn in a playlist."

@@ -248,6 +248,10 @@
           "name": "Eigener Screen (YAML)",
           "description": "Nur für komplexe Anzeigen. Alternativ zu Nachricht oder Uhr verwenden. Bestehende Screen-Objekte bleiben unterstützt."
         },
+        "show": {
+          "name": "In Playlist abspielen",
+          "description": "Ausgeschaltete Screens werden übersprungen. Bei gespeicherten Screens genügt der Name, um die Sichtbarkeit zu ändern."
+        },
         "duration": {
           "name": "Anzeigedauer",
           "description": "Sekunden pro Durchlauf in einer Playlist."

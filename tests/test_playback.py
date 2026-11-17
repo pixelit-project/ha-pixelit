@@ -84,6 +84,66 @@ class PlaybackTests(unittest.IsolatedAsyncioTestCase):
         await self.settle()
         self.assertEqual(self.sent[-1], text("ONE"))
 
+    async def test_visibility_preserves_playlist_order_and_survives_reload(self):
+        await self.player.async_set_playlist(["one", "two", "two", "one"])
+        await self.player.async_set_screen("two", show=False)
+        self.timers[-1].fire()
+        await self.settle()
+        self.assertEqual(self.sent, [text("ONE"), text("ONE")])
+        self.assertEqual(self.player.playlist, ["one", "two", "two", "one"])
+
+        await self.player.async_set_screen("two", text("UPDATED"), 7)
+        restored = Player(self.send, lambda: self.ready, 32, 8, self.store)
+        await restored.async_load()
+        self.assertFalse(restored.screens["two"]["show"])
+        self.assertEqual(restored.playlist, self.player.playlist)
+        await restored.async_stop()
+
+        await self.player.async_set_screen("two", show=True)
+        self.timers[-1].fire()
+        await self.settle()
+        self.timers[-1].fire()
+        await self.settle()
+        self.assertEqual(self.sent[-1], text("UPDATED"))
+        self.assertEqual(self.timers[-1].seconds, 7)
+
+    async def test_all_hidden_playlist_idles_then_resumes_without_reordering(self):
+        await self.player.async_set_screen("one", show=False)
+        await self.player.async_set_screen("two", show=False)
+        await self.player.async_set_playlist(["one", "two"])
+        self.assertEqual(self.sent, [])
+        self.assertEqual(self.timers, [])
+
+        await self.player.async_show_alert(text("ALERT"))
+        await self.player.async_set_screen("two", show=True)
+        self.assertEqual(self.sent[-1], text("ALERT"))
+        self.timers[-1].fire()
+        await self.settle()
+        self.assertEqual(self.sent[-1], text("TWO"))
+
+        await self.player.async_set_screen("two", show=False)
+        self.timers[-1].fire()
+        await self.settle()
+        self.assertEqual(len(self.timers), 2)
+
+        await self.player.async_set_screen("one", show=True)
+        self.assertEqual(len(self.timers), 3)
+        self.assertEqual(self.sent[-1], text("ONE"))
+        self.assertEqual(self.player.playlist, ["one", "two"])
+
+    async def test_alert_expires_to_clock_when_every_screen_is_hidden(self):
+        await self.player.async_set_screen("one", show=False)
+        await self.player.async_set_playlist(["one"])
+        await self.player.async_show_alert(text("ALERT"))
+        self.timers[-1].fire()
+        await self.settle()
+        self.assertEqual(self.sent[-1], {"clock": {"show": True}})
+        self.assertEqual(len(self.timers), 1)
+        self.assertEqual(self.player.playlist, ["one"])
+
+        await self.player.async_show_screen("one")
+        self.assertEqual(self.sent[-1], text("ONE"))
+
     async def test_alert_interrupts_and_resumes_next_screen(self):
         await self.player.async_set_playlist(["one", "two"])
         previous = self.timers[-1]

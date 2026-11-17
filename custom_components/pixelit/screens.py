@@ -316,6 +316,7 @@ class ScreenPlayer:
                 self._validate_name(name)
                 validate_screen(value["screen"], self._width, self._height)
                 duration_seconds(value["duration"])
+                self._validate_show(value.get("show", True))
             playlist = self._validate_playlist(data["playlist"], screens)
             self._check_storage(screens, playlist)
         except (KeyError, TypeError, ValueError, HomeAssistantError) as err:
@@ -327,6 +328,10 @@ class ScreenPlayer:
     def _validate_name(self, name):
         if not isinstance(name, str) or not name.strip() or len(name) > 64:
             raise ServiceValidationError("Screen name must contain 1–64 characters")
+
+    def _validate_show(self, show):
+        if type(show) is not bool:
+            raise ServiceValidationError("Screen visibility must be a boolean")
 
     def _validate_playlist(self, playlist, screens):
         if not isinstance(playlist, list) or len(playlist) > MAX_SCREENS:
@@ -362,18 +367,46 @@ class ScreenPlayer:
         if self._closed:
             raise HomeAssistantError("PixelIt playback is unloaded")
 
-    async def async_set_screen(self, name, screen, duration=5):
+    async def async_set_screen(self, name, screen=None, duration=None, *, show=None):
         self._validate_name(name)
-        seconds = duration_seconds(duration)
+        if show is not None:
+            self._validate_show(show)
         async with self._lock:
             self._ensure_open()
-            content = await self._resolve(screen)
-            self._ensure_open()
-            screens = {**self.screens, name: {"screen": content, "duration": seconds}}
+            previous = self.screens.get(name, {})
+            if screen is None:
+                if show is None or not previous:
+                    raise ServiceValidationError(
+                        "Provide screen content or set visibility for a saved screen"
+                    )
+                content = previous["screen"]
+                default_duration = previous["duration"]
+            else:
+                content = await self._resolve(screen)
+                self._ensure_open()
+                default_duration = 5
+
+            seconds = duration_seconds(
+                default_duration if duration is None else duration
+            )
+            data = {"screen": content, "duration": seconds}
+            if show is not None or "show" in previous:
+                data["show"] = previous["show"] if show is None else show
+            screens = {**self.screens, name: data}
             await self._save(screens, self.playlist)
             self._ensure_open()
             self.screens = screens
-            self._changed()
+            try:
+                if (
+                    show is True
+                    and name in self.playlist
+                    and self._timer is None
+                    and not self.alert_active
+                    and self._ready()
+                ):
+                    await self._play_next()
+            finally:
+                self._changed()
 
     async def async_set_playlist(self, screens):
         async with self._lock:
@@ -383,6 +416,7 @@ class ScreenPlayer:
             self._ensure_open()
             self._cancel_timer()
             self.playlist = playlist
+            self._restore_clock = False
             self._next = 0
             self.alert_active = False
             if playlist and self._ready():
@@ -413,6 +447,7 @@ class ScreenPlayer:
         self._ensure_open()
         self._cancel_timer()
         self.playlist = []
+        self._restore_clock = False
         self.alert_active = False
         await self._send_awake(content, protection_duration)
         self._base = deepcopy(content)
@@ -436,7 +471,7 @@ class ScreenPlayer:
             self._ensure_open()
             self._cancel_timer()
             self.alert_active = True
-            self._restore_clock = self._base is None and not self.playlist
+            self._restore_clock = bool(self.playlist) or self._base is None
             try:
                 await self._send_awake(content)
             except HomeAssistantError:
@@ -448,14 +483,21 @@ class ScreenPlayer:
             self._changed()
 
     async def _play_next(self):
-        name = self.playlist[self._next % len(self.playlist)]
-        data = self.screens[name]
-        await self._send([data["screen"]])
-        self.current = name
-        self._next = (self._next + 1) % len(self.playlist)
-        self._base = deepcopy(data["screen"])
-        self.last_error = None
-        self._schedule(data["duration"])
+        for offset in range(len(self.playlist)):
+            index = (self._next + offset) % len(self.playlist)
+            name = self.playlist[index]
+            data = self.screens[name]
+            if not data.get("show", True):
+                continue
+            await self._send([data["screen"]])
+            self.current = name
+            self._next = (index + 1) % len(self.playlist)
+            self._base = deepcopy(data["screen"])
+            self._restore_clock = False
+            self.last_error = None
+            self._schedule(data["duration"])
+            return True
+        return False
 
     async def _advance(self, generation, resume=False):
         async with self._lock:
@@ -467,7 +509,10 @@ class ScreenPlayer:
             self.alert_active = False
             try:
                 if self.playlist:
-                    await self._play_next()
+                    if not await self._play_next() and self._restore_clock:
+                        await self._send([{"clock": {"show": True}}])
+                        self.current = None
+                        self._restore_clock = False
                 elif self._base is not None:
                     await self._send([self._base])
                 elif not resume or self._restore_clock:

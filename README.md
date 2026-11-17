@@ -363,6 +363,18 @@ its saved screen from an automation when that value changes.
 - **`pixelit.stop_playlist`**: stop rotation and leave the current content visible.
 - **`pixelit.set_screen`**: update saved content, including from an automation.
 
+To skip a saved screen while keeping its place in the playlist, set its visibility
+by name. Set `show: true` when it should play again.
+
+```yaml
+action: pixelit.set_screen
+target:
+  entity_id: light.your_pixelit_display
+data:
+  name: christmas
+  show: false
+```
+
 Avoid running a playlist in Node-RED and HA on the same display simultaneously.
 MQTT controls can remain enabled, but they appear as separate entities.
 
