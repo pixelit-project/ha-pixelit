@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- (o0shojo0o) Added to the HACS / Marketplace catalog.
 
 ## 2.3.1 — 2026-11-17
 - (o0shojo0o) Send degree signs and other non-ASCII screen text as UTF-8 to PixelIt.
