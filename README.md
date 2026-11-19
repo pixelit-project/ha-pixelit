@@ -37,11 +37,18 @@ Maintainers can [publish stable, beta and RC releases using version tags](docs/r
 
 ### Marketplace / HACS (recommended)
 
-1. Open Marketplace / HACS and add `https://github.com/pixelit-project/ha-pixelit` as a **custom repository** with type **Integration**.
+1. Open Marketplace / HACS, search for **PixelIt** and open its repository page. You can also use this button:
+
+   [![Open PixelIt in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=pixelit-project&repository=ha-pixelit&category=integration)
+
 2. Download **PixelIt** and restart Home Assistant.
 3. Open **Settings → Devices & services → Add integration → PixelIt**.
 4. Enter the display's IP address and matrix dimensions (for example, `32` × `8`).
 5. Edit your dashboard, choose **Add card → PixelIt**, select the display's **Liveview** sensor and save.
+
+If PixelIt does not appear in the search results, add
+`https://github.com/pixelit-project/ha-pixelit` under **Custom repositories** with
+type **Integration**, then follow steps 2–5 above.
 
 ### Manual
 
