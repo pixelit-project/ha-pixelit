@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+
+## 2.3.2 — 2026-11-19
 - (o0shojo0o) Added to the HACS / Marketplace catalog.
 
 ## 2.3.1 — 2026-11-17
