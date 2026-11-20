@@ -124,7 +124,7 @@ set_screen:
           mode: box
     show:
       selector:
-        boolean: {}
+        condition: {}
     icon:
       example: 42
       selector:

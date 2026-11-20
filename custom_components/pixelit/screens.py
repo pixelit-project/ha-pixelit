@@ -16,6 +16,7 @@ from .transitions import TRANSITIONS
 
 _LOGGER = logging.getLogger(__name__)
 MAX_SCREENS = 100
+CONDITION_RECHECK_SECONDS = 30
 MAX_STORAGE_BYTES = 256 * 1024
 # Conservative ESP8266 transport budget; firmware remains the final validator.
 MAX_PAYLOAD_BYTES = 12_288
@@ -217,6 +218,7 @@ class ScreenPlayer:
         create_task=None,
         changed=None,
         call_later=None,
+        compile_conditions=None,
     ):
         self._call_later = call_later or (
             lambda seconds, callback: asyncio.get_running_loop().call_later(
@@ -227,6 +229,8 @@ class ScreenPlayer:
         self._ready = ready
         self._width, self._height = width, height
         self._store = store
+        self._compile_conditions = compile_conditions
+        self._condition_checks = {}
         self._bitmaps = None
         self._create_task = create_task or asyncio.create_task
         self._changed = changed or (lambda: None)
@@ -337,8 +341,11 @@ class ScreenPlayer:
             raise ServiceValidationError("Screen name must contain 1–64 characters")
 
     def _validate_show(self, show):
-        if type(show) is not bool:
-            raise ServiceValidationError("Screen visibility must be a boolean")
+        if type(show) is bool or (
+            isinstance(show, list) and all(isinstance(item, dict) for item in show)
+        ):
+            return
+        raise ServiceValidationError("Screen visibility must be a boolean or a list of conditions")
 
     def _validate_playlist(self, playlist, screens):
         if not isinstance(playlist, list) or len(playlist) > MAX_SCREENS:
@@ -398,14 +405,22 @@ class ScreenPlayer:
             )
             data = {"screen": content, "duration": seconds}
             if show is not None or "show" in previous:
-                data["show"] = previous["show"] if show is None else show
+                data["show"] = previous["show"] if show is None else deepcopy(show)
+            check = None
+            if isinstance(show, list) and show:
+                check = await self._compile_conditions(name, show)
+                self._ensure_open()
             screens = {**self.screens, name: data}
             await self._save(screens, self.playlist)
             self._ensure_open()
             self.screens = screens
+            if show is not None:
+                self._condition_checks.pop(name, None)
+                if check is not None:
+                    self._condition_checks[name] = check
             try:
                 if (
-                    show is True
+                    (show is True or isinstance(show, list))
                     and name in self.playlist
                     and self._timer is None
                     and not self.alert_active
@@ -490,12 +505,29 @@ class ScreenPlayer:
             self._changed()
 
     async def _play_next(self):
+        generation = self._generation
+        conditional = False
         for offset in range(len(self.playlist)):
             index = (self._next + offset) % len(self.playlist)
             name = self.playlist[index]
             data = self.screens[name]
-            if not data.get("show", True):
+            show = data.get("show", True)
+            if show is False:
                 continue
+            if isinstance(show, list) and show:
+                conditional = True
+                if name not in self._condition_checks:
+                    try:
+                        self._condition_checks[name] = await self._compile_conditions(
+                            name, show
+                        )
+                    except HomeAssistantError as err:
+                        _LOGGER.warning("Skipping PixelIt screen %s: %s", name, err)
+                        self._condition_checks[name] = lambda: False
+                    if generation != self._generation or self._closed or not self._ready():
+                        return False
+                if not self._condition_checks[name]():
+                    continue
             await self._send([data["screen"]])
             self.current = name
             self._next = (index + 1) % len(self.playlist)
@@ -504,6 +536,8 @@ class ScreenPlayer:
             self.last_error = None
             self._schedule(data["duration"])
             return True
+        if conditional:
+            self._schedule(CONDITION_RECHECK_SECONDS)
         return False
 
     async def _advance(self, generation, resume=False):
@@ -516,7 +550,12 @@ class ScreenPlayer:
             self.alert_active = False
             try:
                 if self.playlist:
-                    if not await self._play_next() and self._restore_clock:
+                    if (
+                        not await self._play_next()
+                        and generation == self._generation
+                        and self._ready()
+                        and self._restore_clock
+                    ):
                         await self._send([{"clock": {"show": True}}])
                         self.current = None
                         self._restore_clock = False
@@ -551,4 +590,4 @@ class ScreenPlayer:
         if tasks:
             await asyncio.gather(*tasks, return_exceptions=True)
         async with self._lock:
-            pass
+            self._condition_checks.clear()

@@ -1,6 +1,7 @@
 # Changelog
 
 ## Unreleased
+- (o0shojo0o) Allow Home Assistant conditions to control when a saved screen plays in a playlist.
 
 ## 2.3.2 — 2026-11-19
 - (o0shojo0o) Added to the HACS / Marketplace catalog.

@@ -370,8 +370,10 @@ its saved screen from an automation when that value changes.
 - **`pixelit.stop_playlist`**: stop rotation and leave the current content visible.
 - **`pixelit.set_screen`**: update saved content, including from an automation.
 
-To skip a saved screen while keeping its place in the playlist, set its visibility
-by name. Set `show: true` when it should play again.
+Use **Play in playlist** to add Home Assistant conditions to a saved screen.
+The screen keeps its place and plays when all conditions pass. If no screen
+can play and a screen has conditions, the playlist checks again after 30 seconds. Use `show: []` to clear
+the conditions. Existing YAML with `show: true` or `show: false` still works.
 
 ```yaml
 action: pixelit.set_screen
@@ -379,7 +381,10 @@ target:
   entity_id: light.your_pixelit_display
 data:
   name: christmas
-  show: false
+  show:
+    - condition: state
+      entity_id: input_boolean.christmas_display
+      state: "on"
 ```
 
 Avoid running a playlist in Node-RED and HA on the same display simultaneously.

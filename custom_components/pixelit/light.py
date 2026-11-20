@@ -122,7 +122,7 @@ class PixelItLight(LightEntity):
         scroll: str = "auto",
         large_font: bool = False,
         center: bool = True,
-        show: bool | None = None,
+        show: bool | list[dict] | None = None,
     ) -> None:
         if (
             show is not None

@@ -70,7 +70,7 @@ ACTION_SCHEMAS = {
         **CONTENT_FIELDS,
         vol.Required("name"): NAME,
         vol.Optional("duration"): seconds,
-        vol.Optional("show"): bool,
+        vol.Optional("show"): vol.Any(bool, [dict]),
     },
     "show_screen": {vol.Required("name"): NAME},
     "set_playlist": {

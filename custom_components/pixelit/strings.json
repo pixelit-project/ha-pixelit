@@ -250,7 +250,7 @@
         },
         "show": {
           "name": "Play in playlist",
-          "description": "Skip the screen when disabled. For a saved screen, only its name is needed to change visibility."
+          "description": "Play this screen in the playlist when all conditions pass. An empty list clears the conditions."
         },
         "duration": {
           "name": "Display duration",

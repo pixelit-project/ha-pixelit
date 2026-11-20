@@ -131,6 +131,41 @@ class PlaybackTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.sent[-1], text("ONE"))
         self.assertEqual(self.player.playlist, ["one", "two"])
 
+    async def test_playlist_rechecks_restored_conditions_when_all_screens_are_skipped(self):
+        enabled = False
+
+        async def compile_conditions(name, conditions):
+            self.assertEqual(name, "one")
+            self.assertEqual(conditions, [{"condition": "state"}])
+            return lambda: enabled
+
+        self.player._compile_conditions = compile_conditions
+        await self.player.async_set_screen("one", show=[{"condition": "state"}])
+        await self.player.async_set_screen("two", show=False)
+        await self.player.async_set_playlist(["one", "two"])
+        await self.player.async_stop()
+        self.player = Player(
+            self.send, lambda: self.ready, 32, 8, self.store,
+            call_later=self.schedule, compile_conditions=compile_conditions,
+        )
+        await self.player.async_load()
+        self.player.state_changed()
+        await self.settle()
+        self.assertEqual(self.sent, [])
+        self.assertEqual(self.timers[-1].seconds, 30)
+
+        enabled = True
+        self.timers[-1].fire()
+        await self.settle()
+        self.assertEqual(self.sent, [text("ONE")])
+        self.assertEqual(self.timers[-1].seconds, 3)
+
+        enabled = False
+        await self.player.async_set_screen("one", show=[])
+        self.timers[-1].fire()
+        await self.settle()
+        self.assertEqual(self.sent, [text("ONE"), text("ONE")])
+
     async def test_alert_expires_to_clock_when_every_screen_is_hidden(self):
         await self.player.async_set_screen("one", show=False)
         await self.player.async_set_playlist(["one"])

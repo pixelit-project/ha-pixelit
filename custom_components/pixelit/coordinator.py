@@ -10,9 +10,10 @@ from collections.abc import Callable
 from contextlib import suppress
 
 import aiohttp
+import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
+from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from yarl import URL
 
@@ -36,6 +37,7 @@ class PixelItCoordinator:
         self, hass: HomeAssistant, host: str, port: int, width: int, height: int
     ):
         """Initialize."""
+        self._hass = hass
         self._session = async_get_clientsession(hass)
         self.on_update: Callable[[], None] | None = None
         self._host = host
@@ -63,7 +65,23 @@ class PixelItCoordinator:
             width,
             height,
             changed=self._publish_controls,
+            compile_conditions=self._async_compile_conditions,
         )
+
+    async def _async_compile_conditions(self, name, conditions):
+        """Prepare a native Home Assistant condition list for repeated checks."""
+        from homeassistant.helpers import condition
+        from homeassistant.helpers.selector import ConditionSelector
+
+        try:
+            config = ConditionSelector()(conditions)
+            config = await condition.async_validate_conditions_config(self._hass, config)
+            checker = await condition.async_conditions_from_config(
+                self._hass, config, _LOGGER, f"PixelIt screen {name}"
+            )
+        except (vol.Invalid, ValueError, HomeAssistantError) as err:
+            raise ServiceValidationError(f"Invalid playlist conditions: {err}") from err
+        return checker
 
     @property
     def session(self) -> aiohttp.ClientSession:

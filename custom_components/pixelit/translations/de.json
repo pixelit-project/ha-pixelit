@@ -250,7 +250,7 @@
         },
         "show": {
           "name": "In Playlist abspielen",
-          "description": "Ausgeschaltete Screens werden übersprungen. Bei gespeicherten Screens genügt der Name, um die Sichtbarkeit zu ändern."
+          "description": "Der Screen wird in der Playlist abgespielt, wenn alle Bedingungen erfüllt sind. Eine leere Liste entfernt die Bedingungen."
         },
         "duration": {
           "name": "Anzeigedauer",
