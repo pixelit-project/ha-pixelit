@@ -75,6 +75,10 @@ class PixelItLight(LightEntity):
         icon_limit_loops: int = 0,
         transition: str | None = None,
         transition_bitmap: int | None = None,
+        gradient_end: str | None = None,
+        gradient_direction: str | None = None,
+        rainbow: bool = False,
+        character_colors: list[str | None] | None = None,
     ) -> None:
         """Wake separately: firmware ignores content alongside sleepMode."""
         screen = build_screen(
@@ -84,6 +88,10 @@ class PixelItLight(LightEntity):
             large_font=large_font,
             center=center,
             icon=icon,
+            gradient_end=gradient_end,
+            gradient_direction=gradient_direction,
+            rainbow=rainbow,
+            character_colors=character_colors,
         )
         screen = with_transition(screen, transition, transition_bitmap, color)
         await self._coordinator.player.async_show_message(
@@ -123,6 +131,10 @@ class PixelItLight(LightEntity):
         large_font: bool = False,
         center: bool = True,
         show: bool | list[dict] | None = None,
+        gradient_end: str | None = None,
+        gradient_direction: str | None = None,
+        rainbow: bool = False,
+        character_colors: list[str | None] | None = None,
     ) -> None:
         if (
             show is not None
@@ -147,6 +159,10 @@ class PixelItLight(LightEntity):
             large_font=large_font,
             center=center,
             icon=icon,
+            gradient_end=gradient_end,
+            gradient_direction=gradient_direction,
+            rainbow=rainbow,
+            character_colors=character_colors,
         )
         screen = with_transition(screen, transition, transition_bitmap, color)
         await self._coordinator.player.async_set_screen(
@@ -183,6 +199,10 @@ class PixelItLight(LightEntity):
         scroll: str = "auto",
         large_font: bool = False,
         center: bool = True,
+        gradient_end: str | None = None,
+        gradient_direction: str | None = None,
+        rainbow: bool = False,
+        character_colors: list[str | None] | None = None,
     ) -> None:
         screen = build_screen(
             screen=screen,
@@ -193,6 +213,10 @@ class PixelItLight(LightEntity):
             large_font=large_font,
             center=center,
             icon=icon,
+            gradient_end=gradient_end,
+            gradient_direction=gradient_direction,
+            rainbow=rainbow,
+            character_colors=character_colors,
         )
         screen = with_transition(screen, transition, transition_bitmap, color)
         await self._coordinator.player.async_show_alert(

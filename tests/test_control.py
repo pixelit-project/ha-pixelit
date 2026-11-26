@@ -319,6 +319,38 @@ class ControlTests(unittest.IsolatedAsyncioTestCase):
                         schema({**data, field: value})
         await self.client.player.async_stop()
 
+    async def test_text_colors_reach_device_for_all_message_actions(self):
+        for action in ("show_message", "show_alert", "set_screen"):
+            with self.subTest(action=action):
+                data = {
+                    "message": "A B",
+                    "gradient_end": "#FF0088",
+                    "gradient_direction": "top_to_bottom",
+                    "rainbow": True,
+                    "character_colors": ["#FFFFFF", None, "#FFD000"],
+                }
+                if action == "set_screen":
+                    data["name"] = "colored"
+                schema = vol.Schema(services.ACTION_SCHEMAS[action])
+                await getattr(self.light, "async_" + action)(**schema(data))
+                if action == "set_screen":
+                    await self.light.async_show_screen("colored")
+                text = self.ws.sent[-1]["setScreen"]["text"]
+                self.assertEqual(text["gradientEnd"], "#FF0088")
+                self.assertEqual(text["gradientDirection"], "topToBottom")
+                self.assertIs(text["rainbow"], True)
+                self.assertEqual(text["characterColors"], data["character_colors"])
+                await self.light.async_stop_playlist()
+
+                for key, value in (
+                    ("gradient_end", "#ABC"),
+                    ("gradient_direction", "diagonal"),
+                    ("character_colors", ["blue"]),
+                    ("character_colors", [None] * 65),
+                ):
+                    with self.assertRaises(vol.Invalid):
+                        schema({**data, key: value})
+
     async def test_ambiguous_or_empty_content_does_not_send(self):
         for action in ("show_alert", "set_screen"):
             schema = vol.Schema(services.ACTION_SCHEMAS[action])

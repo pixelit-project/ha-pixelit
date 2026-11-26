@@ -16,33 +16,38 @@ show_message:
           min: 1
           max: 2147483647
           mode: box
-    color:
-      default: '#FFFFFF'
-      selector:
-        text:
-          type: color
-    transition:
-      default: none
-      selector:
-        select:
-          options:
-          - none
-          - random
-          - fade
-          - colored_bar_wipe
-          - zigzag_wipe
-          - bitmap_wipe
-          - curtain
-          - pixel_dissolve
-          - slide
-          - blinds
-          - crt
-          - glitch
-          - vertical_slide
-          translation_key: transition
     text_options:
       collapsed: true
       fields:
+        color:
+          default: '#FFFFFF'
+          selector:
+            text:
+              type: color
+        gradient_end:
+          selector:
+            text:
+              type: color
+        rainbow:
+          selector:
+            boolean: null
+        gradient_direction:
+          selector:
+            select:
+              options:
+              - left_to_right
+              - right_to_left
+              - top_to_bottom
+              - bottom_to_top
+              - top_left_to_bottom_right
+              - bottom_right_to_top_left
+              - top_right_to_bottom_left
+              - bottom_left_to_top_right
+              translation_key: gradient_direction
+        character_colors:
+          example: '["#FFFFFF", null, "#FFD000"]'
+          selector:
+            object: null
         scroll:
           default: auto
           selector:
@@ -60,7 +65,7 @@ show_message:
           default: true
           selector:
             boolean: null
-    advanced_options:
+    icon_animation_options:
       collapsed: true
       fields:
         icon_rubberbanding:
@@ -84,6 +89,38 @@ show_message:
               step: 1
               unit_of_measurement: ms
               mode: box
+    transition_options:
+      collapsed: true
+      fields:
+        transition:
+          default: none
+          selector:
+            select:
+              options:
+              - none
+              - random
+              - fade
+              - colored_bar_wipe
+              - zigzag_wipe
+              - bitmap_wipe
+              - curtain
+              - pixel_dissolve
+              - slide
+              - blinds
+              - crt
+              - glitch
+              - vertical_slide
+              translation_key: transition
+        transition_bitmap:
+          example: 42
+          selector:
+            number:
+              min: 1
+              max: 2147483647
+              mode: box
+    advanced_options:
+      collapsed: true
+      fields:
         protection_duration:
           default: 0
           selector:
@@ -92,13 +129,6 @@ show_message:
               max: 86400
               step: 1
               unit_of_measurement: s
-              mode: box
-        transition_bitmap:
-          example: 42
-          selector:
-            number:
-              min: 1
-              max: 2147483647
               mode: box
 set_screen:
   target:
@@ -132,36 +162,41 @@ set_screen:
           min: 1
           max: 2147483647
           mode: box
-    color:
-      default: '#FFFFFF'
-      selector:
-        text:
-          type: color
     clock:
       selector:
         boolean: {}
-    transition:
-      default: none
-      selector:
-        select:
-          options:
-          - none
-          - random
-          - fade
-          - colored_bar_wipe
-          - zigzag_wipe
-          - bitmap_wipe
-          - curtain
-          - pixel_dissolve
-          - slide
-          - blinds
-          - crt
-          - glitch
-          - vertical_slide
-          translation_key: transition
     text_options:
       collapsed: true
       fields:
+        color:
+          default: '#FFFFFF'
+          selector:
+            text:
+              type: color
+        gradient_end:
+          selector:
+            text:
+              type: color
+        rainbow:
+          selector:
+            boolean: null
+        gradient_direction:
+          selector:
+            select:
+              options:
+              - left_to_right
+              - right_to_left
+              - top_to_bottom
+              - bottom_to_top
+              - top_left_to_bottom_right
+              - bottom_right_to_top_left
+              - top_right_to_bottom_left
+              - bottom_left_to_top_right
+              translation_key: gradient_direction
+        character_colors:
+          example: '["#FFFFFF", null, "#FFD000"]'
+          selector:
+            object: null
         scroll:
           default: auto
           selector:
@@ -179,7 +214,7 @@ set_screen:
           default: true
           selector:
             boolean: null
-    advanced_options:
+    icon_animation_options:
       collapsed: true
       fields:
         icon_rubberbanding:
@@ -203,9 +238,28 @@ set_screen:
               step: 1
               unit_of_measurement: ms
               mode: box
-        screen:
+    transition_options:
+      collapsed: true
+      fields:
+        transition:
+          default: none
           selector:
-            object: null
+            select:
+              options:
+              - none
+              - random
+              - fade
+              - colored_bar_wipe
+              - zigzag_wipe
+              - bitmap_wipe
+              - curtain
+              - pixel_dissolve
+              - slide
+              - blinds
+              - crt
+              - glitch
+              - vertical_slide
+              translation_key: transition
         transition_bitmap:
           example: 42
           selector:
@@ -213,6 +267,12 @@ set_screen:
               min: 1
               max: 2147483647
               mode: box
+    advanced_options:
+      collapsed: true
+      fields:
+        screen:
+          selector:
+            object: null
 show_screen:
   target:
     entity:
@@ -265,36 +325,41 @@ show_alert:
           min: 1
           max: 2147483647
           mode: box
-    color:
-      default: '#FFFFFF'
-      selector:
-        text:
-          type: color
     clock:
       selector:
         boolean: {}
-    transition:
-      default: none
-      selector:
-        select:
-          options:
-          - none
-          - random
-          - fade
-          - colored_bar_wipe
-          - zigzag_wipe
-          - bitmap_wipe
-          - curtain
-          - pixel_dissolve
-          - slide
-          - blinds
-          - crt
-          - glitch
-          - vertical_slide
-          translation_key: transition
     text_options:
       collapsed: true
       fields:
+        color:
+          default: '#FFFFFF'
+          selector:
+            text:
+              type: color
+        gradient_end:
+          selector:
+            text:
+              type: color
+        rainbow:
+          selector:
+            boolean: null
+        gradient_direction:
+          selector:
+            select:
+              options:
+              - left_to_right
+              - right_to_left
+              - top_to_bottom
+              - bottom_to_top
+              - top_left_to_bottom_right
+              - bottom_right_to_top_left
+              - top_right_to_bottom_left
+              - bottom_left_to_top_right
+              translation_key: gradient_direction
+        character_colors:
+          example: '["#FFFFFF", null, "#FFD000"]'
+          selector:
+            object: null
         scroll:
           default: auto
           selector:
@@ -312,7 +377,7 @@ show_alert:
           default: true
           selector:
             boolean: null
-    advanced_options:
+    icon_animation_options:
       collapsed: true
       fields:
         icon_rubberbanding:
@@ -336,9 +401,28 @@ show_alert:
               step: 1
               unit_of_measurement: ms
               mode: box
-        screen:
+    transition_options:
+      collapsed: true
+      fields:
+        transition:
+          default: none
           selector:
-            object: null
+            select:
+              options:
+              - none
+              - random
+              - fade
+              - colored_bar_wipe
+              - zigzag_wipe
+              - bitmap_wipe
+              - curtain
+              - pixel_dissolve
+              - slide
+              - blinds
+              - crt
+              - glitch
+              - vertical_slide
+              translation_key: transition
         transition_bitmap:
           example: 42
           selector:
@@ -346,3 +430,9 @@ show_alert:
               min: 1
               max: 2147483647
               mode: box
+    advanced_options:
+      collapsed: true
+      fields:
+        screen:
+          selector:
+            object: null

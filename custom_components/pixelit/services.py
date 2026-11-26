@@ -9,6 +9,7 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import service
 
 from .const import DOMAIN
+from .content import GRADIENT_DIRECTIONS
 from .screens import duration_seconds
 from .transitions import TRANSITION_OPTIONS, TRANSITIONS
 
@@ -41,8 +42,15 @@ TRANSITION_FIELDS = {
     vol.Optional("transition"): vol.In((*TRANSITION_OPTIONS, *TRANSITIONS)),
     vol.Optional("transition_bitmap"): vol.All(int, vol.Range(min=1, max=2**31 - 1)),
 }
+HEX_COLOR = vol.All(str, vol.Match(r"^#[0-9A-Fa-f]{6}$"))
 TEXT_FIELDS = {
-    vol.Optional("color", default="#FFFFFF"): vol.Match(r"^#[0-9A-Fa-f]{6}$"),
+    vol.Optional("color", default="#FFFFFF"): HEX_COLOR,
+    vol.Optional("gradient_end"): HEX_COLOR,
+    vol.Optional("gradient_direction"): vol.In(GRADIENT_DIRECTIONS),
+    vol.Optional("rainbow"): cv.boolean,
+    vol.Optional("character_colors"): vol.All(
+        list, vol.Length(max=64), [vol.Any(None, HEX_COLOR)]
+    ),
     vol.Optional("scroll", default="auto"): vol.In(["auto", "always", "off"]),
     vol.Optional("large_font", default=False): cv.boolean,
     vol.Optional("center", default=True): cv.boolean,

@@ -235,12 +235,22 @@ firmware MQTT; native gesture delivery needs a firmware extension.
 
 In **Developer tools → Actions**, or in an automation, select a PixelIt action and
 choose your display. For messages, notifications and saved displays, enter the
-text directly, select a color with the color picker and optionally add a Gallery
-icon. No screen YAML is needed. **Show clock** lets you save a clock instead.
+text directly and optionally add a Gallery icon. **Show clock** lets you save a
+clock instead.
 
-**Text appearance** contains scrolling, large font and centering. **Advanced**
-contains animation speed and the optional custom screen editor. In **Start
-playlist**, add the saved display names individually in the desired order.
+**Text appearance** contains text color, scrolling, font size and centering.
+**Icon animation** contains frame timing, back-and-forth playback and loop count.
+**Transition** contains the effect and its optional Gallery image. The custom
+screen editor is under **Advanced**.
+
+With PixelIt firmware **3.2.0-beta.0 or newer**, **Text appearance** also offers a
+gradient end color, rainbow text and eight gradient directions. Leave the
+direction unset to change colors per character. Rainbow takes precedence over the
+gradient end color. **Character colors (YAML)** can override the first 64
+positions, counting spaces. For example, `["#FFFFFF", null, "#FFD000"]` sets the
+first and third positions and keeps the second position's regular color.
+
+In **Start playlist**, add the saved display names individually in the desired order.
 **Show saved display** only needs its name; **Stop playlist** only needs a target.
 
 The examples below are optional for users who prefer YAML.
@@ -266,7 +276,7 @@ active playlist. For animated icons, you can optionally set
 `icon_animation_delay: 100` to change the time between frames in milliseconds.
 `icon_rubberbanding: true` plays frames back and forth; `icon_limit_loops: 3`
 limits playback to three loops (`0` repeats indefinitely). These options are also
-available under **Advanced options** and have no effect on static icons.
+available under **Icon animation** and have no effect on static icons.
 Icons are downloaded when needed, so Gallery icons require internet access.
 
 ### Show a temporary notification
@@ -308,7 +318,7 @@ data:
 Available choices are None, Random, Fade, Colored bar wipe, Zigzag wipe, Bitmap
 wipe, Curtain, Pixel dissolve, Horizontal slide, Blinds, CRT, Glitch and Vertical
 slide. **Zigzag wipe** uses the selected text color. **Bitmap wipe** additionally
-needs a static Gallery image: enter its ID under **Advanced → Bitmap wipe image**.
+needs a static Gallery image: enter its ID under **Transition → Bitmap wipe image**.
 This image is separate from your message icon.
 
 All listed effects are available in stable **PixelIt firmware 3.0.0**.

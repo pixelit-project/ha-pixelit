@@ -225,6 +225,22 @@
         "icon_limit_loops": {
           "name": "Animationswiederholungen",
           "description": "0 wiederholt unbegrenzt; eine positive Zahl begrenzt die Wiedergabe. Ohne Wirkung bei statischen Icons. Ändert nicht die Alert-Dauer."
+        },
+        "gradient_end": {
+          "name": "Verlaufsendfarbe",
+          "description": "Endfarbe für den Verlauf ab der Textfarbe. Erfordert PixelIt 3.2.0-beta.0 oder neuer."
+        },
+        "rainbow": {
+          "name": "Regenbogentext",
+          "description": "Verteilt Regenbogenfarben über den Text und hat Vorrang vor der Verlaufsendfarbe. Erfordert PixelIt 3.2.0-beta.0 oder neuer."
+        },
+        "gradient_direction": {
+          "name": "Verlaufsrichtung",
+          "description": "Richtung für Farbverlauf oder Regenbogen. Ohne Auswahl wechseln die Farben pro Zeichen."
+        },
+        "character_colors": {
+          "name": "Farben pro Zeichen (YAML)",
+          "description": "Bis zu 64 Farben als Liste im Format #RRGGBB. Leerzeichen zählen mit. null übernimmt die sonstige Textfarbe. Erfordert PixelIt 3.2.0-beta.0 oder neuer."
         }
       },
       "sections": {
@@ -233,6 +249,12 @@
         },
         "advanced_options": {
           "name": "Erweitert"
+        },
+        "icon_animation_options": {
+          "name": "Icon-Animation"
+        },
+        "transition_options": {
+          "name": "Übergang"
         }
       }
     },
@@ -303,6 +325,22 @@
         "icon_limit_loops": {
           "name": "Animationswiederholungen",
           "description": "0 wiederholt unbegrenzt; eine positive Zahl begrenzt die Wiedergabe. Ohne Wirkung bei statischen Icons. Ändert nicht die Alert-Dauer."
+        },
+        "gradient_end": {
+          "name": "Verlaufsendfarbe",
+          "description": "Endfarbe für den Verlauf ab der Textfarbe. Erfordert PixelIt 3.2.0-beta.0 oder neuer."
+        },
+        "rainbow": {
+          "name": "Regenbogentext",
+          "description": "Verteilt Regenbogenfarben über den Text und hat Vorrang vor der Verlaufsendfarbe. Erfordert PixelIt 3.2.0-beta.0 oder neuer."
+        },
+        "gradient_direction": {
+          "name": "Verlaufsrichtung",
+          "description": "Richtung für Farbverlauf oder Regenbogen. Ohne Auswahl wechseln die Farben pro Zeichen."
+        },
+        "character_colors": {
+          "name": "Farben pro Zeichen (YAML)",
+          "description": "Bis zu 64 Farben als Liste im Format #RRGGBB. Leerzeichen zählen mit. null übernimmt die sonstige Textfarbe. Erfordert PixelIt 3.2.0-beta.0 oder neuer."
         }
       },
       "sections": {
@@ -311,6 +349,12 @@
         },
         "advanced_options": {
           "name": "Erweitert"
+        },
+        "icon_animation_options": {
+          "name": "Icon-Animation"
+        },
+        "transition_options": {
+          "name": "Übergang"
         }
       }
     },
@@ -397,6 +441,22 @@
         "icon_limit_loops": {
           "name": "Animationswiederholungen",
           "description": "0 wiederholt unbegrenzt; eine positive Zahl begrenzt die Wiedergabe. Ohne Wirkung bei statischen Icons. Ändert nicht die Alert-Dauer."
+        },
+        "gradient_end": {
+          "name": "Verlaufsendfarbe",
+          "description": "Endfarbe für den Verlauf ab der Textfarbe. Erfordert PixelIt 3.2.0-beta.0 oder neuer."
+        },
+        "rainbow": {
+          "name": "Regenbogentext",
+          "description": "Verteilt Regenbogenfarben über den Text und hat Vorrang vor der Verlaufsendfarbe. Erfordert PixelIt 3.2.0-beta.0 oder neuer."
+        },
+        "gradient_direction": {
+          "name": "Verlaufsrichtung",
+          "description": "Richtung für Farbverlauf oder Regenbogen. Ohne Auswahl wechseln die Farben pro Zeichen."
+        },
+        "character_colors": {
+          "name": "Farben pro Zeichen (YAML)",
+          "description": "Bis zu 64 Farben als Liste im Format #RRGGBB. Leerzeichen zählen mit. null übernimmt die sonstige Textfarbe. Erfordert PixelIt 3.2.0-beta.0 oder neuer."
         }
       },
       "sections": {
@@ -405,6 +465,12 @@
         },
         "advanced_options": {
           "name": "Erweitert"
+        },
+        "icon_animation_options": {
+          "name": "Icon-Animation"
+        },
+        "transition_options": {
+          "name": "Übergang"
         }
       }
     }
@@ -432,6 +498,18 @@
         "crt": "Röhrenmonitor",
         "glitch": "Glitch",
         "vertical_slide": "Vertikal schieben"
+      }
+    },
+    "gradient_direction": {
+      "options": {
+        "left_to_right": "Links nach rechts",
+        "right_to_left": "Rechts nach links",
+        "top_to_bottom": "Oben nach unten",
+        "bottom_to_top": "Unten nach oben",
+        "top_left_to_bottom_right": "Links oben nach rechts unten",
+        "bottom_right_to_top_left": "Rechts unten nach links oben",
+        "top_right_to_bottom_left": "Rechts oben nach links unten",
+        "bottom_left_to_top_right": "Links unten nach rechts oben"
       }
     }
   }

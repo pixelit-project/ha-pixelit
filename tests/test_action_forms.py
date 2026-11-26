@@ -43,7 +43,11 @@ class ActionFormTests(unittest.TestCase):
         for name in ("show_message", "show_alert", "set_screen"):
             fields = descriptions[name]["fields"]
             self.assertIn("text", fields["message"]["selector"])
-            self.assertEqual(fields["color"]["selector"], {"text": {"type": "color"}})
+            text = fields["text_options"]["fields"]
+            self.assertEqual(text["color"]["selector"], {"text": {"type": "color"}})
+            self.assertEqual(text["gradient_end"]["selector"], text["color"]["selector"])
+            self.assertIn("icon_limit_loops", fields["icon_animation_options"]["fields"])
+            self.assertIn("transition_bitmap", fields["transition_options"]["fields"])
             self.assertNotIn("screen", fields)
             self.assertTrue(fields["advanced_options"]["collapsed"])
         self.assertEqual(

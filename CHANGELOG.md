@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+- Add text gradients, rainbow text and per-character colors with PixelIt 3.2.0-beta.0 or newer.
+- Group action options by text appearance, icon animation and transition.
 
 ## 2.3.3 — 2026-11-20
 - (o0shojo0o) Allow Home Assistant conditions to control when a saved screen plays in a playlist.
