@@ -1,6 +1,8 @@
 # Changelog
 
 ## Unreleased
+
+## 2.4.0 — 2026-11-26
 - (o0shojo0o) Add text gradients, rainbow text and per-character colors with PixelIt 3.2.0-beta.0 or newer.
 - (o0shojo0o) Group action options by text appearance, icon animation and transition.
 
