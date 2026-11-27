@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+## 2.5.1 — 2026-11-27
 - (o0shojo0o) Add adjustable scroll speed to text actions.
 
 ## 2.5.0 — 2026-11-27
