@@ -250,6 +250,10 @@ gradient end color. **Character colors (YAML)** can override the first 64
 positions, counting spaces. For example, `["#FFFFFF", null, "#FFD000"]` sets the
 first and third positions and keeps the second position's regular color.
 
+With firmware **3.2.0-beta.1 or newer**, set **Gradient cycle** or
+`gradient_cycle_ms` to animate the gradient or rainbow. The value is in
+milliseconds per cycle (250–60,000). Leave it unset for static colors.
+
 In **Start playlist**, add the saved display names individually in the desired order.
 **Show saved display** only needs its name; **Stop playlist** only needs a target.
 

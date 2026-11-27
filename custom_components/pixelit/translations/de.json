@@ -238,6 +238,10 @@
           "name": "Verlaufsrichtung",
           "description": "Richtung für Farbverlauf oder Regenbogen. Ohne Auswahl wechseln die Farben pro Zeichen."
         },
+        "gradient_cycle_ms": {
+          "name": "Verlaufsdauer",
+          "description": "Millisekunden pro Durchlauf eines bewegten Farbverlaufs oder Regenbogens. Für statische Farben leer lassen. Erfordert PixelIt 3.2.0-beta.1 oder neuer."
+        },
         "character_colors": {
           "name": "Farben pro Zeichen (YAML)",
           "description": "Bis zu 64 Farben als Liste im Format #RRGGBB. Leerzeichen zählen mit. null übernimmt die sonstige Textfarbe. Erfordert PixelIt 3.2.0-beta.0 oder neuer."
@@ -337,6 +341,10 @@
         "gradient_direction": {
           "name": "Verlaufsrichtung",
           "description": "Richtung für Farbverlauf oder Regenbogen. Ohne Auswahl wechseln die Farben pro Zeichen."
+        },
+        "gradient_cycle_ms": {
+          "name": "Verlaufsdauer",
+          "description": "Millisekunden pro Durchlauf eines bewegten Farbverlaufs oder Regenbogens. Für statische Farben leer lassen. Erfordert PixelIt 3.2.0-beta.1 oder neuer."
         },
         "character_colors": {
           "name": "Farben pro Zeichen (YAML)",
@@ -453,6 +461,10 @@
         "gradient_direction": {
           "name": "Verlaufsrichtung",
           "description": "Richtung für Farbverlauf oder Regenbogen. Ohne Auswahl wechseln die Farben pro Zeichen."
+        },
+        "gradient_cycle_ms": {
+          "name": "Verlaufsdauer",
+          "description": "Millisekunden pro Durchlauf eines bewegten Farbverlaufs oder Regenbogens. Für statische Farben leer lassen. Erfordert PixelIt 3.2.0-beta.1 oder neuer."
         },
         "character_colors": {
           "name": "Farben pro Zeichen (YAML)",

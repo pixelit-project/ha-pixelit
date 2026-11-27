@@ -29,6 +29,13 @@ def loop_count(value):
     return value
 
 
+def gradient_cycle_ms(value):
+    """Accept whole milliseconds from YAML and the numeric selector."""
+    if type(value) not in (int, float) or not 250 <= value <= 60000 or value % 1:
+        raise vol.Invalid("Gradient cycle must be an integer from 250 to 60000 ms")
+    return int(value)
+
+
 NAME = vol.All(cv.string, vol.Length(min=1, max=64))
 ICON_FIELDS = {
     vol.Optional("icon"): vol.All(int, vol.Range(min=1, max=2**31 - 1)),
@@ -47,6 +54,7 @@ TEXT_FIELDS = {
     vol.Optional("color", default="#FFFFFF"): HEX_COLOR,
     vol.Optional("gradient_end"): HEX_COLOR,
     vol.Optional("gradient_direction"): vol.In(GRADIENT_DIRECTIONS),
+    vol.Optional("gradient_cycle_ms"): gradient_cycle_ms,
     vol.Optional("rainbow"): cv.boolean,
     vol.Optional("character_colors"): vol.All(
         list, vol.Length(max=64), [vol.Any(None, HEX_COLOR)]

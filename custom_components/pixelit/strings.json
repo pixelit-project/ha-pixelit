@@ -238,6 +238,10 @@
           "name": "Gradient direction",
           "description": "Direction for the gradient or rainbow. Leave unset to change colors per character."
         },
+        "gradient_cycle_ms": {
+          "name": "Gradient cycle",
+          "description": "Milliseconds per cycle for a moving gradient or rainbow. Leave blank for static colors. Requires PixelIt 3.2.0-beta.1 or newer."
+        },
         "character_colors": {
           "name": "Character colors (YAML)",
           "description": "List of up to 64 colors in #RRGGBB format. Spaces count. Use null to keep the existing text color at that position. Requires PixelIt 3.2.0-beta.0 or newer."
@@ -337,6 +341,10 @@
         "gradient_direction": {
           "name": "Gradient direction",
           "description": "Direction for the gradient or rainbow. Leave unset to change colors per character."
+        },
+        "gradient_cycle_ms": {
+          "name": "Gradient cycle",
+          "description": "Milliseconds per cycle for a moving gradient or rainbow. Leave blank for static colors. Requires PixelIt 3.2.0-beta.1 or newer."
         },
         "character_colors": {
           "name": "Character colors (YAML)",
@@ -453,6 +461,10 @@
         "gradient_direction": {
           "name": "Gradient direction",
           "description": "Direction for the gradient or rainbow. Leave unset to change colors per character."
+        },
+        "gradient_cycle_ms": {
+          "name": "Gradient cycle",
+          "description": "Milliseconds per cycle for a moving gradient or rainbow. Leave blank for static colors. Requires PixelIt 3.2.0-beta.1 or newer."
         },
         "character_colors": {
           "name": "Character colors (YAML)",

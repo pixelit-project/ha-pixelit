@@ -326,6 +326,7 @@ class ControlTests(unittest.IsolatedAsyncioTestCase):
                     "message": "A B",
                     "gradient_end": "#FF0088",
                     "gradient_direction": "top_to_bottom",
+                    "gradient_cycle_ms": 2400.0,
                     "rainbow": True,
                     "character_colors": ["#FFFFFF", None, "#FFD000"],
                 }
@@ -338,6 +339,8 @@ class ControlTests(unittest.IsolatedAsyncioTestCase):
                 text = self.ws.sent[-1]["setScreen"]["text"]
                 self.assertEqual(text["gradientEnd"], "#FF0088")
                 self.assertEqual(text["gradientDirection"], "topToBottom")
+                self.assertEqual(text["gradientCycleMs"], 2400)
+                self.assertIs(type(text["gradientCycleMs"]), int)
                 self.assertIs(text["rainbow"], True)
                 self.assertEqual(text["characterColors"], data["character_colors"])
                 await self.light.async_stop_playlist()
@@ -345,6 +348,10 @@ class ControlTests(unittest.IsolatedAsyncioTestCase):
                 for key, value in (
                     ("gradient_end", "#ABC"),
                     ("gradient_direction", "diagonal"),
+                    ("gradient_cycle_ms", True),
+                    ("gradient_cycle_ms", 249),
+                    ("gradient_cycle_ms", 60001),
+                    ("gradient_cycle_ms", 250.5),
                     ("character_colors", ["blue"]),
                     ("character_colors", [None] * 65),
                 ):

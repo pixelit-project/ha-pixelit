@@ -31,6 +31,7 @@ def build_screen(
     icon: int | None = None,
     gradient_end: str | None = None,
     gradient_direction: str | None = None,
+    gradient_cycle_ms: int | None = None,
     rainbow: bool = False,
     character_colors: list[str | None] | None = None,
 ) -> dict:
@@ -57,6 +58,8 @@ def build_screen(
             text["gradientEnd"] = gradient_end
         if gradient_direction is not None:
             text["gradientDirection"] = GRADIENT_DIRECTIONS[gradient_direction]
+        if gradient_cycle_ms is not None:
+            text["gradientCycleMs"] = gradient_cycle_ms
         if rainbow:
             text["rainbow"] = True
         if character_colors:

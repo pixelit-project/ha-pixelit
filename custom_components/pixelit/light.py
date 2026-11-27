@@ -77,6 +77,7 @@ class PixelItLight(LightEntity):
         transition_bitmap: int | None = None,
         gradient_end: str | None = None,
         gradient_direction: str | None = None,
+        gradient_cycle_ms: int | None = None,
         rainbow: bool = False,
         character_colors: list[str | None] | None = None,
     ) -> None:
@@ -90,6 +91,7 @@ class PixelItLight(LightEntity):
             icon=icon,
             gradient_end=gradient_end,
             gradient_direction=gradient_direction,
+            gradient_cycle_ms=gradient_cycle_ms,
             rainbow=rainbow,
             character_colors=character_colors,
         )
@@ -133,6 +135,7 @@ class PixelItLight(LightEntity):
         show: bool | list[dict] | None = None,
         gradient_end: str | None = None,
         gradient_direction: str | None = None,
+        gradient_cycle_ms: int | None = None,
         rainbow: bool = False,
         character_colors: list[str | None] | None = None,
     ) -> None:
@@ -161,6 +164,7 @@ class PixelItLight(LightEntity):
             icon=icon,
             gradient_end=gradient_end,
             gradient_direction=gradient_direction,
+            gradient_cycle_ms=gradient_cycle_ms,
             rainbow=rainbow,
             character_colors=character_colors,
         )
@@ -201,6 +205,7 @@ class PixelItLight(LightEntity):
         center: bool = True,
         gradient_end: str | None = None,
         gradient_direction: str | None = None,
+        gradient_cycle_ms: int | None = None,
         rainbow: bool = False,
         character_colors: list[str | None] | None = None,
     ) -> None:
@@ -215,6 +220,7 @@ class PixelItLight(LightEntity):
             icon=icon,
             gradient_end=gradient_end,
             gradient_direction=gradient_direction,
+            gradient_cycle_ms=gradient_cycle_ms,
             rainbow=rainbow,
             character_colors=character_colors,
         )
