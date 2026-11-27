@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+## 2.5.0 — 2026-11-27
 - (o0shojo0o) Add optional gradient motion to text actions with PixelIt 3.2.0-beta.1 or newer.
 
 ## 2.4.0 — 2026-11-26
