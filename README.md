@@ -239,6 +239,8 @@ text directly and optionally add a Gallery icon. **Show clock** lets you save a
 clock instead.
 
 **Text appearance** contains text color, scrolling, font size and centering.
+Set **Scroll speed** (YAML: `scroll_delay`) to 10–10,000 milliseconds per pixel
+step. Lower values scroll faster. Leave it blank to use the display default.
 **Icon animation** contains frame timing, back-and-forth playback and loop count.
 **Transition** contains the effect and its optional Gallery image. The custom
 screen editor is under **Advanced**.

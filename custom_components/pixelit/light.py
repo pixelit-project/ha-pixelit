@@ -80,12 +80,14 @@ class PixelItLight(LightEntity):
         gradient_cycle_ms: int | None = None,
         rainbow: bool = False,
         character_colors: list[str | None] | None = None,
+        scroll_delay: int | None = None,
     ) -> None:
         """Wake separately: firmware ignores content alongside sleepMode."""
         screen = build_screen(
             message=message,
             color=color,
             scroll=scroll,
+            scroll_delay=scroll_delay,
             large_font=large_font,
             center=center,
             icon=icon,
@@ -138,6 +140,7 @@ class PixelItLight(LightEntity):
         gradient_cycle_ms: int | None = None,
         rainbow: bool = False,
         character_colors: list[str | None] | None = None,
+        scroll_delay: int | None = None,
     ) -> None:
         if (
             show is not None
@@ -159,6 +162,7 @@ class PixelItLight(LightEntity):
             clock=clock,
             color=color,
             scroll=scroll,
+            scroll_delay=scroll_delay,
             large_font=large_font,
             center=center,
             icon=icon,
@@ -208,6 +212,7 @@ class PixelItLight(LightEntity):
         gradient_cycle_ms: int | None = None,
         rainbow: bool = False,
         character_colors: list[str | None] | None = None,
+        scroll_delay: int | None = None,
     ) -> None:
         screen = build_screen(
             screen=screen,
@@ -215,6 +220,7 @@ class PixelItLight(LightEntity):
             clock=clock,
             color=color,
             scroll=scroll,
+            scroll_delay=scroll_delay,
             large_font=large_font,
             center=center,
             icon=icon,

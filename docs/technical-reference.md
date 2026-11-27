@@ -183,7 +183,9 @@ with an aspect-ratio estimate before layout. Pixel gaps shrink on narrow cards.
 
 `set_screen` and `show_alert` accept the same simple text options as
 `show_message`: `message`, `color` (#RRGGBB, default white), `scroll`,
-`large_font`, `center`, and optional `icon`. They can also use `clock: true`
+`scroll_delay`, `large_font`, `center`, and optional `icon`. The optional
+`scroll_delay` maps to `text.scrollTextDelay` (10–10,000 whole milliseconds per
+pixel step). They can also use `clock: true`
 instead of a message. Advanced `screen` payloads remain supported; the screen,
 message and clock choices are mutually exclusive. Icon-only content is allowed.
 Explicit advanced payloads retain their own text styling and positioning.

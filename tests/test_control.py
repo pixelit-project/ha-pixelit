@@ -148,6 +148,7 @@ class ControlTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(text["textString"], "Fertig")
         self.assertEqual(text["hexColor"], "#00FF00")
         self.assertIs(text["scrollText"], False)
+        self.assertNotIn("scrollTextDelay", text)
         self.assertEqual(text["bigFont"], 1)
         self.assertEqual(self.ws.sent[2]["setScreen"], {"sleepMode": True})
 
@@ -215,6 +216,27 @@ class ControlTests(unittest.IsolatedAsyncioTestCase):
         ):
             with self.assertRaises(vol.Invalid):
                 schema(data)
+
+    async def test_scroll_delay_reaches_all_text_actions(self):
+        for action in ("show_message", "set_screen", "show_alert"):
+            with self.subTest(action=action):
+                schema = vol.Schema(services.ACTION_SCHEMAS[action])
+                data = {"message": "Scrolling"}
+                if action == "set_screen":
+                    data["name"] = "scrolling"
+                for invalid in (9, 10001, 40.5, True):
+                    with self.assertRaises(vol.Invalid):
+                        schema({**data, "scroll_delay": invalid})
+                await getattr(self.light, f"async_{action}")(
+                    **schema({**data, "scroll_delay": 40.0})
+                )
+                if action == "set_screen":
+                    screen = self.client.player.screens["scrolling"]["screen"]
+                else:
+                    screen = self.ws.sent[-1]["setScreen"]
+                self.assertEqual(screen["text"]["scrollTextDelay"], 40)
+                self.assertIs(type(screen["text"]["scrollTextDelay"]), int)
+        await self.client.player.async_stop()
 
     async def test_friendly_alert_fields_become_screen_content(self):
         data = vol.Schema(services.ACTION_SCHEMAS["show_alert"])(

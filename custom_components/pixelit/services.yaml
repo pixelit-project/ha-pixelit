@@ -66,6 +66,14 @@ show_message:
               - always
               - 'off'
               translation_key: scroll
+        scroll_delay:
+          selector:
+            number:
+              min: 10
+              max: 10000
+              step: 1
+              mode: box
+              unit_of_measurement: ms
         large_font:
           default: false
           selector:
@@ -224,6 +232,14 @@ set_screen:
               - always
               - 'off'
               translation_key: scroll
+        scroll_delay:
+          selector:
+            number:
+              min: 10
+              max: 10000
+              step: 1
+              mode: box
+              unit_of_measurement: ms
         large_font:
           default: false
           selector:
@@ -396,6 +412,14 @@ show_alert:
               - always
               - 'off'
               translation_key: scroll
+        scroll_delay:
+          selector:
+            number:
+              min: 10
+              max: 10000
+              step: 1
+              mode: box
+              unit_of_measurement: ms
         large_font:
           default: false
           selector:

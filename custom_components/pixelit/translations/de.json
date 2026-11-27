@@ -190,6 +190,10 @@
           "name": "Scrollmodus",
           "description": "Automatisch, immer oder aus."
         },
+        "scroll_delay": {
+          "name": "Scrollgeschwindigkeit",
+          "description": "Millisekunden pro Pixelschritt. Kleinere Werte scrollen schneller. Leer lassen, um den Gerätestandard zu verwenden."
+        },
         "large_font": {
           "name": "Große Schrift",
           "description": "Große statt kleiner Schrift verwenden."
@@ -310,6 +314,10 @@
           "name": "Zentrieren",
           "description": "Text horizontal zentrieren."
         },
+        "scroll_delay": {
+          "name": "Scrollgeschwindigkeit",
+          "description": "Millisekunden pro Pixelschritt. Kleinere Werte scrollen schneller. Leer lassen, um den Gerätestandard zu verwenden."
+        },
         "large_font": {
           "name": "Große Schrift",
           "description": "Große statt kleiner Schrift verwenden."
@@ -429,6 +437,10 @@
         "center": {
           "name": "Zentrieren",
           "description": "Text horizontal zentrieren."
+        },
+        "scroll_delay": {
+          "name": "Scrollgeschwindigkeit",
+          "description": "Millisekunden pro Pixelschritt. Kleinere Werte scrollen schneller. Leer lassen, um den Gerätestandard zu verwenden."
         },
         "large_font": {
           "name": "Große Schrift",

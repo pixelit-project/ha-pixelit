@@ -36,6 +36,13 @@ def gradient_cycle_ms(value):
     return int(value)
 
 
+def scroll_delay_ms(value):
+    """Accept whole milliseconds from YAML and the numeric selector."""
+    if type(value) not in (int, float) or not 10 <= value <= 10000 or value % 1:
+        raise vol.Invalid("Scroll delay must be an integer from 10 to 10000 ms")
+    return int(value)
+
+
 NAME = vol.All(cv.string, vol.Length(min=1, max=64))
 ICON_FIELDS = {
     vol.Optional("icon"): vol.All(int, vol.Range(min=1, max=2**31 - 1)),
@@ -60,6 +67,7 @@ TEXT_FIELDS = {
         list, vol.Length(max=64), [vol.Any(None, HEX_COLOR)]
     ),
     vol.Optional("scroll", default="auto"): vol.In(["auto", "always", "off"]),
+    vol.Optional("scroll_delay"): scroll_delay_ms,
     vol.Optional("large_font", default=False): cv.boolean,
     vol.Optional("center", default=True): cv.boolean,
 }

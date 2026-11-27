@@ -34,6 +34,7 @@ def build_screen(
     gradient_cycle_ms: int | None = None,
     rainbow: bool = False,
     character_colors: list[str | None] | None = None,
+    scroll_delay: int | None = None,
 ) -> dict:
     """Keep advanced screen payloads compatible without silently merging content."""
     if sum((screen is not None, message is not None, clock)) > 1:
@@ -52,6 +53,8 @@ def build_screen(
             "bigFont": bool(large_font),
             "centerText": center,
         }
+        if scroll_delay is not None:
+            text["scrollTextDelay"] = scroll_delay
         if icon is None:
             text["position"] = {"x": 0, "y": 1}
         if gradient_end is not None:

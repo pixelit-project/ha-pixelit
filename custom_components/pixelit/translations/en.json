@@ -190,6 +190,10 @@
           "name": "Scrolling",
           "description": "Scroll automatically, always, or never."
         },
+        "scroll_delay": {
+          "name": "Scroll speed",
+          "description": "Milliseconds per pixel step. Lower values scroll faster. Leave blank to use the device default."
+        },
         "large_font": {
           "name": "Large font",
           "description": "Use the large font instead of the small font."
@@ -310,6 +314,10 @@
           "name": "Center text",
           "description": "Center text horizontally."
         },
+        "scroll_delay": {
+          "name": "Scroll speed",
+          "description": "Milliseconds per pixel step. Lower values scroll faster. Leave blank to use the device default."
+        },
         "large_font": {
           "name": "Large font",
           "description": "Use the large font instead of the small font."
@@ -429,6 +437,10 @@
         "center": {
           "name": "Center text",
           "description": "Center text horizontally."
+        },
+        "scroll_delay": {
+          "name": "Scroll speed",
+          "description": "Milliseconds per pixel step. Lower values scroll faster. Leave blank to use the device default."
         },
         "large_font": {
           "name": "Large font",
